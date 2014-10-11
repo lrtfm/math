@@ -1,0 +1,75 @@
+\documentclass[14pt, hyperref={CJKbookmarks=true}]{beamer}
+\usepackage{amsmath}
+\usepackage[space,noindent]{ctex}
+
+\usefonttheme[onlymath]{serif}
+\usefonttheme{professionalfonts}
+%\usetheme{AnnArbor}
+\usetheme{default}
+\usecolortheme{seahorse}
+\setbeamercolor{normal terxt}{bg=black!10}
+
+% 两端对齐
+\renewcommand{\raggedright}{\leftskip=0pt \rightskip=0pt plus 0cm}
+\raggedright
+
+\begin{document}
+\title[FDM]{Problem of Finite Difference Methods}
+%\subtitle{HW}
+\author{O0O}
+%\institute[M]{S}
+\date[A0A]{A-A-A-A-0-0-0-0-A-A-A-A}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}
+    \frametitle{Description of HW 1.2.1}
+    %\framesubtitle{HW 1.2.1}
+    % add your description here.
+    We consider the following initial-boundary-value problem
+    %\begin{gather}
+    \begin{subequations}\label{problem1}
+        \begin{align} 
+            v_{t} & = \nu v_{xx}, x\in(0,1), t>0 \\ 
+            v(x,0) & = f(x), x\in[0,1] \\
+            v(0,t) & = a(t), v(1,t) = b(t), t\ge0
+        \end{align}
+    \end{subequations}
+    where $f(0) = a(0)$, and $f(1) = b(0)$.
+    %\end{gather}
+\end{frame}
+
+\begin{frame}
+\frametitle{Detail of HW 1.2.1}
+%\framesubtitle{HW 1.2.1}
+% add your description here.
+Write a code to approximately solve problem \eqref{problem1}.
+Use $f(x) = sin2{\pi}x$, $a = b = 0$, $M = 10$ and $\nu = 1/6$.
+Find solutions at $t = 0.06$, $t = 0.1$, $t = 0.9$ and $t = 50.0$. 
+For the first three values of $t$, use ${\Delta}t = 0.02$. 
+To speed solution to the last value of $t$, you might use a larger 
+value for ${\Delta}t$. Determine how large you can choose ${\Delta}t$ 
+and still get results that might be correct. 
+Compare and contrast your solutions to the exact solutions.
+\end{frame}
+
+% 中文
+\begin{frame}
+\frametitle{问题描述 HW 1.2.1}
+%\framesubtitle{HW 1.2.1}
+% add your description here.
+考虑如下初边值问题
+%\begin{gather}
+\begin{align}
+v_{t} & = \nu v_{xx}, x\in(0,1), t>0 \\
+v(x,0) & = f(x), x\in[0,1] \\
+v(0,t) & = a(t), v(1,t) = b(t), t\ge0
+\end{align}
+其中 $f(0) = a(0)$, $f(1) = b(0)$.
+%\end{gather}
+\end{frame}
+
+\end{document}
+
