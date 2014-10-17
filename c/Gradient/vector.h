@@ -1,17 +1,18 @@
 #include <stdlib.h>
+#include <stdarg.h>
 
 struct vector {
     int n; // 鍚戦噺缁村害
     double *data;
 };
 
-void initvector(struct vector &a)
+void initvector(struct vector *a)
 {
     a->n = 0;
     a->data = NULL;
 }
 
-void initvector2(struct vector &a, int n, ...)
+void initvector2(struct vector *a, int n, ...)
 {
     a->n = n;
     a->data = malloc(n * sizeof(double));
@@ -26,7 +27,7 @@ void initvector2(struct vector &a, int n, ...)
     va_end(ap);
 }
 
-void finivector(struct vector &a)
+void finivector(struct vector *a)
 {
     if (a->data)
     {
@@ -35,7 +36,7 @@ void finivector(struct vector &a)
     a->n = 0;
 }
 
-void add(struct vector &a, struct vector &b, struct vector &c)
+void add(struct vector *a, struct vector *b, struct vector *c)
 {
     if (a->n != b->n)
     {
@@ -43,7 +44,7 @@ void add(struct vector &a, struct vector &b, struct vector &c)
         return ;
     }
 
-    if (b == c) {
+    if (b != c) {
         finivector(c);
         c->n = a->n;
         c->data = malloc(c->n * sizeof(double));
@@ -54,25 +55,33 @@ void add(struct vector &a, struct vector &b, struct vector &c)
     }
 }
 
-void mul(double alpha, struct vector &a, struct vector &b)
+void mul(double alpha, struct vector *a, struct vector *b)
 {
     int i;
-    if (a == b) {
-        b->n = a->n;
+    if (a != b) {
         finivector(b);
+        b->n = a->n;
         b->data = malloc(b->n * sizeof(double));
     }
     for (i = 0; i < a->n; ++i) {
-        *(b->data + i) = *(a.data + i) * alpha;
+        *(b->data + i) = *(a->data + i) * alpha;
     }
 }
 
-double len(struct vector & a)
+double len(struct vector * a)
 {
-    // todo
-    return 1.0;
+    
+    double l = 0;
+    double t = 0;
+    int i;
+    for (i = 0; i < a->n; ++i) {
+        t = *(a->data + i);
+        l += t*t;
+    }
+
+    return l;
 }
 
 typedef double(*oned)(double);
-typedef double (*fun)(struct vector&);
-typedef void (*grad)(struct vector&, struct vector&);
+typedef double (*fun)(struct vector*);
+typedef void (*grad)(struct vector*, struct vector*);
