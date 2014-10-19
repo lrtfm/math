@@ -11,7 +11,7 @@ objects=${OBJECT_DIR}/parse.o ${OBJECT_DIR}/collect.o ${OBJECT_DIR}/math_wapper.
 test_objects=${OBJECT_DIR}/collect.o ${OBJECT_DIR}/test_trim.o
 
 parse_formula:${objects} ${OBJECT_DIR}/main.o
-	${CC} -lm -lreadline -g ${objects} ${OBJECT_DIR}/main.o -o ${BIN_DIR}/parse_formula
+	${CC} -g ${objects} ${OBJECT_DIR}/main.o -o ${BIN_DIR}/parse_formula -lreadline -lm
 
 static_lib:${objects}
 	ar -r ${LIB_DIR}/libparseformula.a ${objects}
