@@ -20,35 +20,35 @@ int main(int argc, char **argv)
 {
     // int N; // 空间网格数
     
-    double V[N-1]; // 对角阵，一阶项系数
-    double D[N-1]; // 对角阵，分数阶项系数
-    double F[N-1]; // 列向量，右端项
+    double V[N]; // 对角阵，一阶项系数
+    double D[N]; // 对角阵，分数阶项系数
+    double F[N]; // 列向量，右端项
 
     //  1  0  0  0
     // -1  1  0  0
     //  0 -1  1  0
     //  0  0  0 -1
-    double L[(N-1)*(N-1)]; 
+    double L[N*N]; 
 
     // g1 g0  0  0
     // g2 g1 g0  0
     // g3 g2 g1 g0
     // g4 g3 g2 g1
-    double T[(N-1)*(N-1)];
+    double T[N*N];
 
-    memset(V, 0, (N-1)*sizeof(double));
-    memset(D, 0, (N-1)*sizeof(double));
-    memset(F, 0, (N-1)*sizeof(double));
-    memset(L, 0, (N-1)*(N-1)*sizeof(double));
-    memset(T, 0, (N-1)*(N-1)*sizeof(double));
+    memset(V, 0, N*sizeof(double));
+    memset(D, 0, N*sizeof(double));
+    memset(F, 0, N*sizeof(double));
+    memset(L, 0, N*N*sizeof(double));
+    memset(T, 0, N*N*sizeof(double));
 
     // L
     int i = 0;
     int j = 0;
-    L[(N-1)*(N-1) - 1] = 1;
-    for (i = 0; i < N - 2; i++) {
-        L[i + i * (N - 1)] = 1; // i 行 i 列
-        L[i + i * (N - 1) + 1] = -1; // i+1 行 j 列
+    L[N*N - 1] = 1;
+    for (i = 0; i < N - 1; i++) {
+        L[i + i * N] = 1; // i 行 i 列
+        L[i + i * N + 1] = -1; // i+1 行 j 列
     }
 
 
@@ -65,15 +65,15 @@ int main(int argc, char **argv)
     v0 = 4.0; d0 = 2.4;
     tau = 1;
     alpha = 1.6;
-    TIME = 100;
+    TIME = 200;
 
     h = (b - a) / N;
     r = tau/h; s = tau / (pow(h, alpha));
 
-    for (i = 0; i < N - 1; i++) {  // i 行标
-        for (j = 0; j < N - 1; j++) {  // j 列标
+    for (i = 0; i < N ; i++) {  // i 行标
+        for (j = 0; j < N ; j++) {  // j 列标
             if (i - j + 1 >= 0) {
-                T[i + j * (N - 1)] = gweight(i - j + 1, alpha);
+                T[i + j * N ] = gweight(i - j + 1, alpha);
             }
         }
     }
@@ -81,52 +81,59 @@ int main(int argc, char **argv)
 //    print_matrix(N - 1, N - 1, L, "Matrix L");
 //    print_matrix(N - 1, N - 1, T, "Matrix T");
 
-    for (i = 0; i < N - 1; ++i) {
+    for (i = 0; i < N ; ++i) {
         x = a + (i + 1) * h;
         V[i] = advection(v0, x);
         D[i] = dispersion(d0, x);
     }
 
-    double C[N-1];
-    memset(C, 0, (N-1)*sizeof(double));
-    double CN[N-1];
-    memset(CN, 0, (N-1)*sizeof(double));
+    double C[N];
+    memset(C, 0, N*sizeof(double));
 
-    for (i = 0; i < N - 1; i++) {
+    for (i = 0; i < N; i++) {
         C[i] = phi((i+1)*h);
     }
 
-    double WORK1[(N-1)*(N-1)];
-    double WORK2[(N-1)*(N-1)];
-    memset(WORK1, 0, (N-1)*(N-1)*sizeof(double));
-    memset(WORK2, 0, (N-1)*(N-1)*sizeof(double));
-    double A[(N-1)*(N-1)];
-    memset(A, 0, (N-1)*(N-1)*sizeof(double));
+    double WORK1[N*N];
+    double WORK2[N*N];
+    memset(WORK1, 0, N*N*sizeof(double));
+    memset(WORK2, 0, N*N*sizeof(double));
+    double A[N*N];
+    memset(A, 0, N*N*sizeof(double));
 
-    multip_sddmo(r, N - 1, V, L, WORK1);
+    multip_sddmo(r, N, V, L, WORK1);
     //print_matrix(N - 1, N - 1, T, "Matrix T");
-    multip_sddmo(s, N - 1, D, T, WORK2);
-    printf(" r = %lf, s = %f\n", r, s);
+    multip_sddmo(s, N, D, T, WORK2);
+    // printf(" r = %lf, s = %f\n", r, s);
     //print_matrix(N - 1, 1, D, "Matrix D");
     //print_matrix(N - 1, N - 1, WORK1, "Matrix work1");
     //print_matrix(N - 1, N - 1, WORK2, "Matrix work2");
 
-    double I[(N-1)*(N-1)];
-    memset(I, 0, (N-1)*(N-1)*sizeof(double));
-    for (i = 0; i < N - 1; ++i) {
-        I[i + i * (N-1)] = 1.0;
+    double I[N*N];
+    memset(I, 0, N*N*sizeof(double));
+    for (i = 0; i < N; ++i) {
+        I[i + i * N] = 1.0;
     }
 
-    minus_dmmmo(N - 1, I, WORK1, WORK2, A);
+    minus_dmmmo(N, I, WORK1, WORK2, A);
 
-    int DIM = N - 1;
+    // adjust A by boundary condition.
+    
+    print_matrix(N, N, A, "Matrix A");
+    for (i = 0; i < N; ++i) {
+        A[ N - 1 + i * N] = 0;
+    }
+    A[N*N - 1] = 1;
+    A[N*N - N - 1] = - 1;
+    print_matrix(N, N, A, "Matrix A");
+
+    int DIM = N;
     int NRHS = 1;
     int INFO = 0;
-    double R[N-1];
-    memset(R, 0, (N-1)*sizeof(double));
-    double B[N-1];
-    memset(B, 0, (N-1)*sizeof(double));
-    print_matrix(N - 1, N - 1, A, "Matrix A");
+    double R[N];
+    memset(R, 0, N*sizeof(double));
+    double B[N];
+    memset(B, 0, N*sizeof(double));
 
     // 时间步循环迭代
     t = 0;
@@ -134,35 +141,36 @@ int main(int argc, char **argv)
         t += tau;
 
         // 右端项 f
-        for (i = 0; i < N - 1; i++) {
-            F[i] = force(a + (i+1)*h, t);
+        for (i = 0; i < N; i++) {
+            F[i] = tau * force(a + (i+1)*h, t);
         }
         
-        print_matrix(1, N - 1, F, "vector F");
+        print_matrix(1, N, F, "vector F");
         // 边界条件
         double c0, cN; // c0, cN 
         c0 = lboundary(t); // t = (n + 1)*tau
-        cN = rboundary(t);
+        cN = rboundary(t); // nouse
 
-        for ( i = 0; i < N - 1; i++) {
+        for ( i = 0; i < N; i++) {
             R[i] = s * c0 * D[i] * gweight(i + 2, alpha);
         }
         R[0] = R[0] - r * V[0] * c0;
-        R[N-1] = R[N-1] + s * D[N-1] * cN * gweight(0, alpha);
 
-        for (i = 0; i < N - 1; i++) {
+        for (i = 0; i < N; i++) {
             B[i] = R[i] + F[i] + C[i];
         }
 
-        print_matrix(1, N - 1, B, "vector B");
-        // A*CN = B 求解
-        dgesv_(&DIM, &NRHS, A, &DIM, R, B, &DIM, &INFO);
-        // lapack
+        // 调整最后一个值 B[N-1]  需要根据边界条件更改
+        B[N-1] = 0;
 
-        // output CN
-        print_matrix(1, N - 1, B, "vector solution B");
+        print_matrix(1, N, B, "vector B");
+        // A*X = B 求解
+        dgesv_(&DIM, &NRHS, A, &DIM, R, B, &DIM, &INFO);
+
+        print_matrix(1, N, B, "vector solution B");
+//        printf("%lf ", B[N-1]);
         // C <- B 
-        memcpy(C, B, (N-1)*sizeof(double));
+        memcpy(C, B, N*sizeof(double));
     }
 
     return 0;
@@ -193,7 +201,6 @@ double dispersion(double d, double x)
 
 double force(double x, double t)
 {
-    // TODO
     if (x > -30.2 && x < -30.1 && t < 4) {
         return 5.93;
     }
@@ -201,7 +208,6 @@ double force(double x, double t)
 }
 double phi(double x)
 {
-    // TODO
     return 0;
 }
 int multip_sddmo(double s, int d, double *D, double *M, double *O)
@@ -221,13 +227,7 @@ int minus_dmmmo(int d, double *I, double *M2, double *M3, double *O)
     int i, j;
     for (i = 0; i < d; ++i) { // 行
         for (j = 0; j < d; ++j) {
-//            if (i == j) {
-                O[i + j * d] = I[i + j * d] - (M2[i + j * d] + M3[i + j * d]);
-//            }
-//            else {
-//                O[i + j * d] = - (M2[i + j * d] + M3[i + j * d]);
-//            }
-
+            O[i + j * d] = I[i + j * d] + M2[i + j * d] - M3[i + j * d];
         }
     }
     return 0;
