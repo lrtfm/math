@@ -2,41 +2,28 @@
 #define __GRADIENTDESCENT_HPP__
 #include "Mvector.hpp"
 
-typedef double (*Function)(const Mvector &x);
-
-class FunctionWapper
+class FunctionObject
 {
 public:
-    FunctionWapper()
-    {}
-
-    FunctionWapper(int d, Function fun) : d_(d), fun_(fun)
-    {}
-
-    FunctionWapper(const FunctionWapper &o) : d_(o.d_), fun_(o.fun_)
-    {}
-
-    double getValueAtPoint(const Mvector &x) {
-        return fun_(x);
-    }
-
     double operator()(const Mvector &x) {
-        // return getValueAtPoint(x);
-        return fun_(x);
+        return function(x);
     }
 
-private:
-    int d_;
-    Function fun_;
+    virtual int getDimension() = 0;
+    virtual double function(const Mvector &x) {
+        return 0;
+    }
+
+    virtual ~FunctionObject(){}
 };
 
 class GradientDescent 
 {
 public:
-    GradientDescent()
-    {}
+    //GradientDescent()
+    //{}
 
-    GradientDescent(FunctionWapper &fWapper) : fWapper_(fWapper)
+    GradientDescent(FunctionObject &fun) : fun_(fun)
     {}
 
     Mvector solver(const Mvector &x, double epsilon)
@@ -68,21 +55,21 @@ private:
         double u1;
         double u2;
         double l;
-        int d = x.getDim();
+        int d = fun_.getDimension();
         Mvector oGrad(d);
         Mvector nGrad(d);
         Mvector e;
         double h = 0.01;
         for (int i = 0; i < d; i++) {
-            nGrad[i] = (fWapper_(x.delta(i, h)) - fWapper_(x.delta(i, -h)))/(2.0*h);
+            nGrad[i] = (fun_(x.delta(i, h)) - fun_(x.delta(i, -h)))/(2.0*h);
         }
 
         do {
             h = h/2.0;
             oGrad = nGrad;
             for (int i = 0; i < d; i++) {
-                u1 = 8 * (fWapper_(x.delta(i, h)) - fWapper_(x.delta(i, -h)));
-                u2 = fWapper_(x.delta(i, -2.0*h)) - fWapper_(x.delta(i, -2.0*h));
+                u1 = 8 * (fun_(x.delta(i, h)) - fun_(x.delta(i, -h)));
+                u2 = fun_(x.delta(i, -2.0*h)) - fun_(x.delta(i, -2.0*h));
                 l = 12.0*h;
                 nGrad[i] = (u1 + u2) / l;
             }
@@ -97,7 +84,7 @@ private:
     double funOfAlpha(double alpha)
     {
         Mvector x = currX_ + alpha * currD_;
-        return fWapper_(x);
+        return fun_(x);
     }
         
     void advanceAndRetreat(double x, double *a, double *b)
@@ -147,7 +134,8 @@ private:
 private:
     Mvector currX_;
     Mvector currD_;
-    FunctionWapper fWapper_;
+    FunctionObject &fun_;
 };
+
 
 #endif
