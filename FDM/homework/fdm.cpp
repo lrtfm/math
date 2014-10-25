@@ -33,8 +33,10 @@ int FDM::solver_FTCS(int M, double stepT, std::vector<double> timeNeedPrint, int
     for (int i = 0; i <= M; ++i) {
         uOld->at(i) = initialValueCond_(i * stepX);
     }
+    uOld->at(0) = leftBoundaryCond_(0.0);
+    uOld->at(M) = rightBoundaryCond_(0.0);
 
-    std::cout << "++++++++++++++++++++++++++++++++++ Begin output +++++++++++++++++++++++++++++++++++++" << std::endl;
+    std::cout << "++++++++++++++++++++++++++++++++++ Begin " << stepT << " output +++++++++++++++++++++++++++++++++++++" << std::endl;
     print(0.0, *uOld);
     int n = 1;
     bool stop = false;
@@ -58,7 +60,7 @@ int FDM::solver_FTCS(int M, double stepT, std::vector<double> timeNeedPrint, int
         uNew = uTemp;
         n++;
     }
-    std::cout << "++++++++++++++++++++++++++++++++++  End  output +++++++++++++++++++++++++++++++++++++" << std::endl;
+    std::cout << "++++++++++++++++++++++++++++++++++  End " << stepT << " output +++++++++++++++++++++++++++++++++++++" << std::endl;
 
     return 0;
 }

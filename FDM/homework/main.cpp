@@ -33,16 +33,18 @@ void problem_121()
     time.push_back(0.06);
     time.push_back(0.1);
     time.push_back(0.9);
+    time.push_back(50);
 
     fdm.solver_FTCS(10, 0.02, time, 0);
 
     std::vector<double>time2;
     time2.push_back(50.0);
+    fdm.solver_FTCS(10, 0.01, time2, 0);
+    fdm.solver_FTCS(10, 0.02, time2, 0);
+    fdm.solver_FTCS(10, 0.025, time2, 0);
+    fdm.solver_FTCS(10, 0.04, time2, 0);
     fdm.solver_FTCS(10, 0.05, time2, 0);
     fdm.solver_FTCS(10, 0.1, time2, 0);
-    fdm.solver_FTCS(10, 0.2, time2, 0);
-    fdm.solver_FTCS(10, 0.5, time2, 0);
-    fdm.solver_FTCS(10, 1.0, time2, 0);
 }
 
 double initialValueCond_158(double x)
@@ -78,7 +80,7 @@ void problem_158()
     
 int main()
 {
-    problem_158();
+//    problem_158();
     problem_121();
 
     return 0;
