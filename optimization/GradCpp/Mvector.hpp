@@ -65,8 +65,11 @@ public:
 
     }
 
+    // 向量加法
     friend Mvector operator+(const Mvector &a, const Mvector &b);
+    // 向量减法
     friend Mvector operator-(const Mvector &a, const Mvector &b);
+    // 向量数乘运算
     friend Mvector operator*(double alpha, const Mvector &x);
 
 private:

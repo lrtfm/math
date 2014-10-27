@@ -4,77 +4,123 @@
 FDM::FDM()
 {}
 
-FDM::FDM(double left, double right, double mu,
-        InitialBoundaryCond leftBoundaryCond, 
-        InitialBoundaryCond rightBoundaryCond,
-        InitialBoundaryCond initialValueCond,
-        SourceTerm sourceTerm) 
-    : left_(left), right_(right), mu_(mu),
-      leftBoundaryCond_(leftBoundaryCond),
-      rightBoundaryCond_(rightBoundaryCond),
-      initialValueCond_(initialValueCond),
-      sourceTerm_(sourceTerm)
-{}
+// 构造函数
+FDM::FDM(double left, double right, double mu, SourceTerm sourceTerm) 
+    : left_(left), right_(right), mu_(mu), sourceTerm_(sourceTerm)
+{  
 
-int FDM::solver()
-{
-    return 0;
+    leftBoundaryCond_ = NULL; // a(t); leftBoundary
+    leftNeumannCond_ = NULL; // 纽曼边界条件
+    rightBoundaryCond_ = NULL; // b(t); rightBoundary
+    rightNeumannCond_ = NULL;
+    initialValueCond_ = NULL;
 }
 
-int FDM::solver_FTCS(int M, double stepT, std::vector<double> timeNeedPrint, int N)
+FDM::~FDM()
 {
-    std::vector<double> u1(M + 1), u2(M + 1);
-    std::vector<double> *uOld = &u1;
-    std::vector<double> *uNew = &u2;
-    std::vector<double> *uTemp;
-
-    double stepX = (right_ - left_) / M;
-
-    for (int i = 0; i <= M; ++i) {
-        uOld->at(i) = initialValueCond_(i * stepX);
+    if (file_.is_open()) {
+        file_.close();
     }
-    uOld->at(0) = leftBoundaryCond_(0.0);
-    uOld->at(M) = rightBoundaryCond_(0.0);
+}
 
-    std::cout << "++++++++++++++++++++++++++++++++++ Begin " << stepT << " output +++++++++++++++++++++++++++++++++++++" << std::endl;
-    print(0.0, *uOld);
-    int n = 1;
+void FDM::setFile(const char *fileName)
+{
+    if (file_.is_open()) {
+        file_.close();
+    }
+    file_.open(fileName, std::ofstream::out | std::ofstream::app);
+}
+
+void FDM::setNeumannOrder(int order)
+{
+    neumannOrder_ = order;
+}
+
+void FDM::setLeftBoundaryCond(InitialBoundaryCond leftBoundaryCond) 
+{
+    leftBoundaryCond_ = leftBoundaryCond;
+}
+
+void FDM::setLeftNeumannCond(InitialBoundaryCond leftNeumannCond)
+{
+    leftNeumannCond_ = leftNeumannCond;
+}
+
+void FDM::setRightBoundaryCond(InitialBoundaryCond rightBoundaryCond)
+{
+    rightBoundaryCond_ = rightBoundaryCond;
+}
+
+void FDM::setRightNeumannCond(InitialBoundaryCond rightNeumannCond)
+{
+    rightNeumannCond_ = rightNeumannCond;
+}
+
+void FDM::setInitialValueCond(InitialBoundaryCond initialValueCond)
+{
+    initialValueCond_ = initialValueCond;
+}
+
+void FDM::setParameter(int M, double stepT)
+{
+    M_ = M;
+    stepT_ = stepT;
+    stepX_ = (right_ - left_) / M;
+}
+    
+void FDM::initial(std::vector<double> &value)
+{
+    for (int i = 0; i <= M_; ++i) {
+        value[i] = initialValueCond_(i * stepX_);
+    }
+}
+
+int FDM::solver_FTCS(std::vector<double> timeNeedPrint)
+{
+    std::vector<double> uNew(M_+1), uOld(M_+1);
+
+    initial(uNew);
+
+    double currentT = 0;
     bool stop = false;
-    while (!stop) {
-        FTCS_scheme(*uOld, stepX, stepT, n, *uNew);
-
-        double currentT = n * stepT;
-
-        if (N == 0 && needPrint(stepT, currentT, timeNeedPrint)) {
-            print(currentT, *uNew);
-        } else if (N != 0){
-            print(currentT, *uNew);
-        }
-        clearTime(stepT, currentT, timeNeedPrint);
-
-        if ((N == 0 && needStop(timeNeedPrint)) || ( N != 0 && n >= N))
-            stop = true;
-
-        uTemp = uOld;
+    for (int n = 1; stop != true; ++n) {
         uOld = uNew;
-        uNew = uTemp;
-        n++;
+        currentT = n * stepT_;
+        FTCS_scheme(n, uOld, uNew);
+
+        print(currentT, timeNeedPrint, uNew);
+        stop = isNeedStop(timeNeedPrint);
     }
-    std::cout << "++++++++++++++++++++++++++++++++++  End " << stepT << " output +++++++++++++++++++++++++++++++++++++" << std::endl;
 
     return 0;
 }
 
-int FDM::FTCS_scheme(std::vector<double> &uOld, double stepX, double stepT, int n, std::vector<double> &uNew)
+int FDM::FTCS_scheme(int n, std::vector<double> &uOld, std::vector<double> &uNew)
 {
-    int M = uOld.size() - 1;
-    double r = mu_ * stepT / (stepX * stepX);
-    for (int k = 1; k < M; ++k) {
+    double r = mu_ * stepT_ / (stepX_ * stepX_);
+    double s = mu_ * stepT_ / stepX_;
+    for (int k = 1; k < M_; ++k) {
         uNew[k] = uOld[k] + r * centeredSecondDiff(uOld, k) + 
-            stepT * sourceTerm_(k*stepX, n*stepT);
+            stepT_ * sourceTerm_(k*stepX_, n*stepT_);
     }
-    uNew[0] = leftBoundaryCond_(n*stepT);
-    uNew[M] = rightBoundaryCond_(n*stepT);
+    if (leftNeumannCond_ == NULL){
+        uNew[0] = leftBoundaryCond_(n*stepT_);
+    } else {
+        if (neumannOrder_ == 1) {
+            uNew[0] = uNew[1] - stepX_ * leftNeumannCond_(n*stepT_);
+        } else {
+            uNew[0] = uOld[0] + 2*r*(uOld[1] - uOld[0]) - 2*s*leftNeumannCond_((n-1)*stepT_);
+        }
+    }
+    if (rightNeumannCond_ == NULL) {
+        uNew[M_] = rightBoundaryCond_(n*stepT_);
+    } else {
+        if (neumannOrder_ == 1) {
+            uNew[M_] = uNew[M_-1] + stepX_ * rightNeumannCond_(n*stepT_);
+        } else {
+            uNew[M_] = uOld[M_] + 2*r*(uOld[M_-1] - uOld[M_]) + 2*s*rightNeumannCond_((n-1)*stepT_);
+        }
+    }
 }
 
 double FDM::centeredSecondDiff(std::vector<double> &u, int k)
@@ -82,30 +128,21 @@ double FDM::centeredSecondDiff(std::vector<double> &u, int k)
     return u[k-1] - 2*u[k] + u[k+1];
 }
 
-bool FDM::needPrint(double stepT, double currentTime, std::vector<double> &outTime)
+// 需要优化 功能太杂
+void FDM::print(double currentTime, std::vector<double> & timeVect, std::vector<double> &u)
 {
-    for(int i = 0; i < outTime.size(); ++i) {
-        if (outTime[i] < currentTime + stepT/4.0 && outTime[i] > currentTime - stepT/4.0) {
-            return true;
+    for(std::vector<double>::iterator it = timeVect.begin(); it != timeVect.end(); ) {
+        if (*it > currentTime - stepT_/4.0 && *it < currentTime + stepT_/4.0) {
+            file_ << "StepT :" << std::setw(6) << std::setprecision(3) << stepT_ ;
+            file_ << ",Time :" << std::setw(6) << std::setprecision(3) << currentTime << "->";
+            for (int i = 0; i < u.size(); ++i) {
+                file_ << std::setw(10) << std::setprecision(6) << u[i] << "\t";
+            }
+            file_ << std::endl;
+            it = timeVect.erase(it);
         }
-    }
-    return false;
-}
-
-void FDM::print(double currentTime, std::vector<double> & u)
-{
-    std::cout << "Time = " << currentTime << ":" << std::endl;
-    for (int i = 0; i < u.size(); ++i) {
-        std::cout << std::setw(12) << std::setprecision(6) << u[i] << "\t";
-    }
-    std::cout << std::endl;
-}
-
-void FDM::clearTime(double stepT, double currentTime, std::vector<double> &outTime)
-{
-    for(std::vector<double>::iterator it = outTime.begin(); it != outTime.end(); ) {
-        if (*it < currentTime + 3*stepT/4.0) {
-            it = outTime.erase(it);
+        else if (*it < currentTime + 3*stepT_/4.0) {
+            it = timeVect.erase(it);
         }
         else {
             ++it;
@@ -113,7 +150,7 @@ void FDM::clearTime(double stepT, double currentTime, std::vector<double> &outTi
     }
 }
 
-bool FDM::needStop(std::vector<double> &outTime)
+bool FDM::isNeedStop(std::vector<double> &outTime)
 {
     return outTime.empty();
 }
