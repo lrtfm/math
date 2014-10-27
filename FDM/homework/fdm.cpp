@@ -4,7 +4,6 @@
 FDM::FDM()
 {}
 
-// 构造函数
 FDM::FDM(double left, double right, double mu, SourceTerm sourceTerm) 
     : left_(left), right_(right), mu_(mu), sourceTerm_(sourceTerm)
 {  
@@ -121,6 +120,8 @@ int FDM::FTCS_scheme(int n, std::vector<double> &uOld, std::vector<double> &uNew
             uNew[M_] = uOld[M_] + 2*r*(uOld[M_-1] - uOld[M_]) + 2*s*rightNeumannCond_((n-1)*stepT_);
         }
     }
+
+    return 0;
 }
 
 double FDM::centeredSecondDiff(std::vector<double> &u, int k)
