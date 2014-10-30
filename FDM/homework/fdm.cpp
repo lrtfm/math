@@ -4,7 +4,6 @@
 FDM::FDM()
 {}
 
-// 构造函数
 FDM::FDM(double left, double right, double mu, SourceTerm sourceTerm) 
     : left_(left), right_(right), mu_(mu), sourceTerm_(sourceTerm)
 {  
@@ -95,6 +94,41 @@ int FDM::solver_FTCS(std::vector<double> timeNeedPrint)
     return 0;
 }
 
+double FDM::real_value(double x, double t)  
+{   
+    return exp(-4*3.1415926*3.1415926/6*t)*sin(2*3.1415926*x);
+}
+
+int FDM::solver_leapforg(std::vector<double> timeNeedPrint)
+{
+    std::vector<double> uNew(M_ + 1), uMid(M_ + 1), uOld(M_ + 1);
+
+    initial(uMid);
+    for (int i = 0; i <= M_; ++i) {
+        uNew(i) = real_value(i * stepX_, stepT_);
+    }
+
+
+    double currentT = 0;
+    double r = mu_ * stepT_ / (stepX_ * stepX_);
+    bool stop = false;
+    for (int n = 1; stop != true; ++n) {
+        uOld = uMid;
+        uMid = uNew;
+        currentT = n * stepT_;
+
+        for (int k = 1; k < M_; ++k) {
+            uNew[k] = uOld[k] + 2 * r * (uMid[k+1] - 2*uMid[k] + uMid[k-1]);
+        }
+        uNew[0] = 0; uNew[M_] = 0;
+
+        print(currentT, timeNeedPrint, uNew);
+        stop = isNeedStop(timeNeedPrint);
+    }
+
+    return 0;
+}
+
 int FDM::FTCS_scheme(int n, std::vector<double> &uOld, std::vector<double> &uNew)
 {
     double r = mu_ * stepT_ / (stepX_ * stepX_);
@@ -121,6 +155,8 @@ int FDM::FTCS_scheme(int n, std::vector<double> &uOld, std::vector<double> &uNew
             uNew[M_] = uOld[M_] + 2*r*(uOld[M_-1] - uOld[M_]) + 2*s*rightNeumannCond_((n-1)*stepT_);
         }
     }
+
+    return 0;
 }
 
 double FDM::centeredSecondDiff(std::vector<double> &u, int k)

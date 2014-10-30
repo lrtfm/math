@@ -39,7 +39,6 @@ void problem_121()
     time.push_back(50);
     fdm.solver_FTCS(time);
 
-
     fdm.setFile("problem_1.2.1_2.txt");
     std::vector<double>time2;
     time2.push_back(50.0);
