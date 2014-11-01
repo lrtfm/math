@@ -1,3 +1,6 @@
+/* fdm_solver.hpp
+ *
+ */
 #ifndef __FDM_SOLVER_HPP__
 #define __FDM_SOLVER_HPP__
 

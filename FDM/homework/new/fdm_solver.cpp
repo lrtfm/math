@@ -1,3 +1,6 @@
+/* fdm_solver.cpp
+ */
+
 #include "fdm_solver.hpp"
 
 FDM::FDM()
@@ -68,7 +71,7 @@ void FDM::setTime(std::vector<double> & times)
 void FDM::print(double currentTime, std::vector<double> & u)
 {
     file_ << "T " << currentTime << ":";
-    for (int i = 0; i < u.size(); ++i) {
+    for (size_t i = 0; i < u.size(); ++i) {
         file_ << std::setw(8) << std::setprecision(4) << u[i] << "\t";
     }
     file_ << std::endl;
