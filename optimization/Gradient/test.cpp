@@ -10,8 +10,7 @@ double fun2(const Mvector &x)
 {
     double a = x[0];
     double b = x[1];
-    double r = a*a + b * b;
-    return 8 *r*r*r*r + 900*r*r*r + 30;
+    return 8 *a*a + b*b + 5*b + 30;
 }
 
 
@@ -23,24 +22,13 @@ int main(int argc, char **argv)
 
     Mvector ret(2);
     Mvector x0(2);
-    x0[0] = 200;
-    x0[1] = 300;
-   
-    x0.print("The initial x0");
-    ret = gradDescent.solver(x0, 0.000001);
-    ret.print("The return value");
-
     x0[0] = 20;
     x0[1] = 30;
-    x0.print("The initial x0");
-    ret = gradDescent.solver(x0, 0.000001);
-    ret.print("The return value");
+   
 
-    x0[0] = 10;
-    x0[1] = 100;
-    x0.print("The initial x0");
     ret = gradDescent.solver(x0, 0.000001);
-    ret.print("The return value");
+    ret = gradDescent.solver2(x0, 0.000001);
+
     return 0;
 }
 

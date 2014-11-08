@@ -39,6 +39,12 @@ public:
         return ret;
     }
 
+    Mvector delta(int i, double hi, int j, double hj) const {
+        Mvector ret(*this);
+        ret.v_[i] += hi;
+        ret.v_[j] += hj;
+        return ret;
+    }
     double getNorm() const {
         double norm = 0;
         for (int i = 0; i < d_; ++i) {
@@ -78,6 +84,7 @@ public:
     friend Mvector operator-(const Mvector &a, const Mvector &b);
     // 向量数乘运算
     friend Mvector operator*(double alpha, const Mvector &x);
+    friend double operator*(const Mvector &x, const Mvector &y);
 
 private:
     int d_;
@@ -112,6 +119,17 @@ Mvector operator*(double alpha, const Mvector &x)
     Mvector ret(x.getDim());
     for (int i = 0; i < x.d_; ++i) {
         ret.v_[i] = alpha * x.v_[i];
+    }
+    return ret;
+}
+
+double operator*(const Mvector &x, const Mvector &y)
+{
+    double ret = 0.0;
+    if (x.d_ == y.d_) {
+        for (int i = 0; i < x.d_; ++i) {
+            ret += x[i] * y[i];
+        }
     }
     return ret;
 }
