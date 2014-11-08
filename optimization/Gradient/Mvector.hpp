@@ -22,6 +22,13 @@ public:
     Mvector(const std::vector<double> &v) : d_(v.size()), v_(v)
     {}
 
+    int setDim(int d) {
+        int t = d_;
+        v_.resize(d);
+        d_ = d;
+        return t;
+    }
+
     int getDim() const {
         return d_;
     }

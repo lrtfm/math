@@ -1,2 +1,2 @@
 all:
-	gcc -g GradientDescent.c
+	g++ -g test.cpp -o test
