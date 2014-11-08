@@ -65,7 +65,7 @@ int main(int argc, char **argv)
     v0 = 4.0; d0 = 2.4;
     tau = 1;
     alpha = 1.6;
-    TIME = 200;
+    TIME = 150;
 
     h = (b - a) / N;
     r = tau/h; s = tau / (pow(h, alpha));
@@ -119,12 +119,8 @@ int main(int argc, char **argv)
 
     // adjust A by boundary condition.
     
-    print_matrix(N, N, A, "Matrix A");
-    for (i = 0; i < N; ++i) {
-        A[ N - 1 + i * N] = 0;
-    }
-    A[N*N - 1] = 1;
-    A[N*N - N - 1] = - 1;
+    //print_matrix(N, N, A, "Matrix A");
+    A[N*N - N - 1] -= gweight(0, alpha)*D[N-1];
     print_matrix(N, N, A, "Matrix A");
 
     int DIM = N;
@@ -149,24 +145,24 @@ int main(int argc, char **argv)
         // 边界条件
         double c0, cN; // c0, cN 
         c0 = lboundary(t); // t = (n + 1)*tau
-        cN = rboundary(t); // nouse
 
-        for ( i = 0; i < N; i++) {
-            R[i] = s * c0 * D[i] * gweight(i + 2, alpha);
-        }
-        R[0] = R[0] - r * V[0] * c0;
+        //for ( i = 0; i < N; i++) {
+        //    R[i] = s * c0 * D[i] * gweight(i + 2, alpha);
+        //}
+        //R[0] = R[0] - r * V[0] * c0;
 
         for (i = 0; i < N; i++) {
-            B[i] = R[i] + F[i] + C[i];
+            //B[i] = R[i] + F[i] + C[i];
+            B[i] = F[i] + C[i];
         }
 
         // 调整最后一个值 B[N-1]  需要根据边界条件更改
-        B[N-1] = 0;
+        // B[N-1] = 0;
 
-        print_matrix(1, N, B, "vector B");
         // A*X = B 求解
         dgesv_(&DIM, &NRHS, A, &DIM, R, B, &DIM, &INFO);
 
+        printf("T = %lf,", t);
         print_matrix(1, N, B, "vector solution B");
 //        printf("%lf ", B[N-1]);
         // C <- B 
@@ -191,12 +187,12 @@ double gweight(int k, double alpha)
 
 double advection(double v, double x)
 {
-    return v/x;
+    return v/fabs(x);
 }
 
 double dispersion(double d, double x)
 {
-    return d/x;
+    return d/fabs(x);
 }
 
 double force(double x, double t)
