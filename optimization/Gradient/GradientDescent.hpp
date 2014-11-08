@@ -148,7 +148,7 @@ private:
 
 
 private:
-    FunctionObject &fun_;
+    FunctionObject fun_;
     double inner_epsilon_;
 };
 
