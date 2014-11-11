@@ -13,65 +13,48 @@ public:
         inner_epsilon_ = 0.000001;
     }
 
-
-    Mvector solver(const Mvector &x, double epsilon)
+    Mvector gd_solver(const Mvector &x, double epsilon)
     {
         Mvector cx = x;
-        Mvector grad = -1 * getGrad(cx, epsilon);
+        Mvector grad = getGrad(cx, epsilon);
+        Mvector d = -1 * grad;
         double alpha;
         double minAlpha, maxAlpha;
         int i = 0;
 
         while (grad.getNorm() > epsilon) {
             i++;
-            fun_.setToOneD(cx, grad);
-            MSP::advanceAndRetreat(fun_, 10, &minAlpha, &maxAlpha);
-            alpha = MSP::goldSection(fun_, minAlpha, maxAlpha, epsilon);
-            // std::cout << "alpha" << ":" << alpha << std::endl;
-            cx = cx + alpha * grad;
-            grad = -1 * getGrad(cx, epsilon);
+            alpha = oneDimSearch(cx, d, epsilon);
+            cx = cx + alpha * d;
+            grad = getGrad(cx, epsilon);
+            d = -1 * grad;
         }
-        std::cout << "G Result Info:" << std::endl
-                  << "\tThe begin point: " << transform(x) << "'" << std::endl
-                  << "\tThe result point: " << transform(cx) << "'" << std::endl
-                  << "\tIterator times: " << i << std::endl;
-
+        output("Gradient descent method", x, cx, i); 
         return cx;
     }
 
     // 共轭梯度方法
-    Mvector solver2(const Mvector &x, double epsilon)
+    Mvector cg_solver(const Mvector &x, double epsilon)
     {
         Mvector cx = x;
-        // Mmatrix hessian = getHessian(cx, epsilon);
         Mvector ograd = getGrad(cx, epsilon);
         Mvector grad;
-        Mvector od = -1 * ograd;
-        Mvector d;
+        Mvector d = -1 * ograd;
         double alpha;
         double beta;
-        double minAlpha, maxAlpha;
         int i = 0;
 
         while (ograd.getNorm() > epsilon) {
             i++;
-            fun_.setToOneD(cx, od);
-            MSP::advanceAndRetreat(fun_, 10, &minAlpha, &maxAlpha);
-            alpha = MSP::goldSection(fun_, minAlpha, maxAlpha, epsilon);
-            //std::cout << "alpha" << ":" << alpha << std::endl;
-            cx = cx + alpha * od;
+            alpha = oneDimSearch(cx, d, epsilon);
+            cx = cx + alpha * d;
             grad = getGrad(cx, epsilon);
-            // beta = grad.getNorm() / ograd.getNorm();
             beta = ((transform(grad) * grad ) / (transform(ograd) * ograd))(0,0);
-            d = -1 * grad + beta * od;
-            od = d;
+            d = -1 * grad + beta * d;
             ograd = grad;
         }
 
-        std::cout << "CG Result Info:" << std::endl
-                  << "\tThe begin point: " << transform(x) << "'" << std::endl
-                  << "\tThe result point: " << transform(cx) << "'" << std::endl
-                  << "\tIterator times: " << i << std::endl;
+        output("Conjugate gradient method", x, cx, i);
         return cx;
     }
 
@@ -79,7 +62,6 @@ public:
     {
         Mvector ox = x;
         Mvector cx;
-        // Mmatrix hessian = getHessian(cx, epsilon);
         Mmatrix H = Mmatrix::E(fun_.getDimension());
         Mvector ograd = getGrad(ox, epsilon);
         Mvector grad;
@@ -87,17 +69,12 @@ public:
         Mvector s;
         Mvector y;
         double alpha;
-        double beta;
-        double minAlpha, maxAlpha;
         int i = 0;
 
         while (ograd.getNorm() > epsilon) {
             i++;
             d = -1 * H * ograd;
-            fun_.setToOneD(ox, d);
-            MSP::advanceAndRetreat(fun_, 10, &minAlpha, &maxAlpha);
-            alpha = MSP::goldSection(fun_, minAlpha, maxAlpha, epsilon);
-            //std::cout << "alpha" << ":" << alpha << std::endl;
+            alpha = oneDimSearch(ox, d, epsilon);
             cx = ox + alpha * d;
             grad = getGrad(cx, epsilon);
             s = cx - ox;
@@ -108,23 +85,33 @@ public:
             ox = cx;
         }
 
-        output("DFP Result Info:", x, cx, i);
-
+        output("DFP method result for ", x, cx, i);
         return cx;
     }
+
 private:
-    void output(std::string s,const Mvector & x, const Mvector &cx, int i) {
-        std::cout << s << std::endl
+
+    double oneDimSearch(const Mvector & x, const Mvector & d, double epsilon)
+    {
+        double alpha;
+        double minAlpha, maxAlpha;
+        fun_.setToOneD(x, d);
+        MSP::advanceAndRetreat(fun_, 10, &minAlpha, &maxAlpha);
+        alpha = MSP::goldSection(fun_, minAlpha, maxAlpha, epsilon);
+        return alpha;
+    }
+
+    void output(const std::string & s,const Mvector & x, const Mvector &cx, int i) {
+        std::cout << s << " for function " << fun_.info() << ":" << std::endl
                   << "\tThe begin point: " << transform(x) << "'" << std::endl
                   << "\tThe result point: " << transform(cx) << "'" << std::endl
-                  << "\tIterator times: " << i << std::endl;
-
+                  << "\tIterator times: " << i << std::endl << std::endl;
     }
+
     // 数值算法计算函数在某点处的梯度
     // { 8 * [f(x+h)-f(x-h)] - f(x+2h) + f(x-2h) } / 12h
     Mvector getGrad(const Mvector &x, double epsilon)
     {
-        // std::cout << "Begin " << std::endl;
         double u1;
         double u2;
         double l;
@@ -149,7 +136,6 @@ private:
 
             e = nGrad - oGrad;
         } while (h > inner_epsilon_ && e.getNorm() > epsilon);
-        // std::cout << "End " << std::endl;
         
         return nGrad;
     }
@@ -188,12 +174,10 @@ private:
     }
     */
 
-
 private:
     FunctionObject fun_;
     double inner_epsilon_;
 };
 
-// static double GradientDescent::inner_epsilon_ = 0.00001;
-
 #endif
+

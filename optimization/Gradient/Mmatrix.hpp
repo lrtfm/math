@@ -4,8 +4,6 @@
 #include <iostream>
 #include <vector>
 
-class Mvector;
-
 class Mmatrix{
 public:
     Mmatrix():m_(0),n_(0) {}
@@ -91,7 +89,7 @@ std::ostream & operator<<(std::ostream &o , const Mmatrix &a)
     o << "[";
     for (int i = 0; i < a.m_; ++i) {
         if (i != 0) {
-            o << std::endl;
+            o << "; "; // std::endl;
         }
         for (int j = 0; j < a.n_; ++j) {
             if (j != 0) {
