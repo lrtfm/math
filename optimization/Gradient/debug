@@ -1,0 +1,108 @@
+BUGCOMMIT:    commit b9c64950f7f1e4be02f2ad8ca92d91762cdbb157
+错误现象
+$ ./test
+DEBUG1 :        20      30
+DEBUG2 :        -426.667        -86.6667
+
+代码位置
+Mvector solver(const Mvector &x, double epsilon)
+{
+    ...
+
+    while (grad.getNorm() > epsilon) {
+        i++;
+        x.print("DEBUG1");
+        fun_.setToOneD(cx, grad);
+        x.print("DEBUG2");
+        ...
+    }
+    ...
+}
+
+这里x的值不应该会发生变化的， 但是变化了。
+
+
+代码调试信息
+yangzongze@node10 ~/yzz/Grad
+$ gdb test
+GNU gdb Fedora (6.8-37.el5)
+Copyright (C) 2008 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-redhat-linux-gnu"...
+(gdb) l
+12          double b = x[1];
+13          return 8 *a*a + b*b + 5*b + 30;
+14      }
+15
+16
+17      int main(int argc, char **argv)
+18      {
+19          //FunctionObject myfun(function, 2);
+20          //GradientDescent gradDescent(myfun);
+21          GradientDescent gradDescent(FunctionObject(fun2, 2));
+(gdb)
+22
+23          Mvector ret(2);
+24          Mvector x0(2);
+25          x0[0] = 20;
+26          x0[1] = 30;
+27
+28
+29          ret = gradDescent.solver(x0, 0.000001);
+30          ret = gradDescent.solver2(x0, 0.000001);
+31
+(gdb)
+32          return 0;
+33      }
+34
+35
+(gdb) b 29
+Breakpoint 1 at 0x4013bc: file test.cpp, line 29.
+(gdb) r
+Starting program: /public/home/yangzongze/yzz/Grad/test
+
+Breakpoint 1, main (argc=1, argv=0x7fffe5148098) at test.cpp:29
+29          ret = gradDescent.solver(x0, 0.000001);
+(gdb) p x0
+$1 = {d_ = 2, v_ = {<std::_Vector_base<double,std::allocator<double> >> = {
+      _M_impl = {<std::allocator<double>> = {<__gnu_cxx::new_allocator<double>> = {<No data fields>}, <No data fields>}, _M_start = 0x58ce030,
+        _M_finish = 0x58ce040, _M_end_of_storage = 0x58ce040}}, <No data fields>}}
+(gdb) p myfun
+No symbol "myfun" in current context.
+(gdb) p grad
+gradDescent  grad_
+(gdb) p gradDescent
+$2 = {fun_ = @0x7fffe5147f10, inner_epsilon_ = 9.9999999999999995e-07}
+(gdb) p gradDescent.fun_
+$3 = (FunctionObject &) @0x7fffe5147f10: {dim_ = 2, mfun_ = 0x400c48 <fun2(Mvector const&)>, x_ = {d_ = 2,
+    v_ = {<std::_Vector_base<double,std::allocator<double> >> = {
+        _M_impl = {<std::allocator<double>> = {<__gnu_cxx::new_allocator<double>> = {<No data fields>}, <No data fields>}, _M_start = 0x58ce010,
+          _M_finish = 0x58ce020, _M_end_of_storage = 0x58ce020}}, <No data fields>}}, grad_ = {d_ = 2,
+    v_ = {<std::_Vector_base<double,std::allocator<double> >> = {
+        _M_impl = {<std::allocator<double>> = {<__gnu_cxx::new_allocator<double>> = {<No data fields>}, <No data fields>}, _M_start = 0x58ce030,
+          _M_finish = 0x58ce040, _M_end_of_storage = 0x58ce040}}, <No data fields>}}}
+(gdb)
+
+    从这里看出  x 和 gradDescent.fun_ 的 grad_ 变量的地址重合了。 why?
+
+GradientDescent 构造函数
+    GradientDescent(FunctionObject fun) : fun_(fun)
+    {
+        inner_epsilon_ = 0.000001;
+    }
+GradientDescent 数据成员 (注意下面用的是引用)
+private:
+    FunctionObject &fun_;
+
+    所以构造函数调用后其实fun_这个对象已经被析构了
+    它所占的空间有被分配了， 在主函数有如下代码
+
+GradientDescent gradDescent(FunctionObject(fun2, 2));
+
+Mvector ret(2);
+Mvector x0(2);
+    被析构后， 又要构造新的变量 x0 和 ret 所以导致所占内存空间重合.
+
