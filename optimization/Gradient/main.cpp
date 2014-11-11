@@ -26,9 +26,12 @@ int main(int argc, char **argv)
     x0[1] = 30;
    
 
+    std::cout << "8x^2 + y^2 + 5y + 30" << std::endl;
     ret = gradDescent.solver(x0, 0.000001);
     ret = gradDescent.solver2(x0, 0.000001);
+    ret = gradDescent.dfp_solver(x0, 0.000001);
 
+    //std::cout << "8x^2 + y^2 + 5y + 30" << std::endl;
     return 0;
 }
 

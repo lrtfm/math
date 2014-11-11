@@ -24,19 +24,17 @@ public:
 
         while (grad.getNorm() > epsilon) {
             i++;
-        x.print("DEBUG1");
             fun_.setToOneD(cx, grad);
-        x.print("DEBUG2");
             MSP::advanceAndRetreat(fun_, 10, &minAlpha, &maxAlpha);
             alpha = MSP::goldSection(fun_, minAlpha, maxAlpha, epsilon);
             // std::cout << "alpha" << ":" << alpha << std::endl;
             cx = cx + alpha * grad;
             grad = -1 * getGrad(cx, epsilon);
         }
-        std::cout << "G Result Info:" << std::endl;
-        x.print("\tThe begin point");
-        cx.print("\tThe result point");
-        std::cout << "\tIterator times: " << i << std::endl;
+        std::cout << "G Result Info:" << std::endl
+                  << "\tThe begin point: " << transform(x) << "'" << std::endl
+                  << "\tThe result point: " << transform(cx) << "'" << std::endl
+                  << "\tIterator times: " << i << std::endl;
 
         return cx;
     }
@@ -63,21 +61,65 @@ public:
             //std::cout << "alpha" << ":" << alpha << std::endl;
             cx = cx + alpha * od;
             grad = getGrad(cx, epsilon);
-            beta = grad * grad / (ograd * ograd);
+            // beta = grad.getNorm() / ograd.getNorm();
+            beta = ((transform(grad) * grad ) / (transform(ograd) * ograd))(0,0);
             d = -1 * grad + beta * od;
             od = d;
             ograd = grad;
         }
 
-        std::cout << "CG Result Info:" << std::endl;
-        x.print("\tThe begin point");
-        cx.print("\tThe result point");
-        std::cout << "\tIterator times: " << i << std::endl;
-
+        std::cout << "CG Result Info:" << std::endl
+                  << "\tThe begin point: " << transform(x) << "'" << std::endl
+                  << "\tThe result point: " << transform(cx) << "'" << std::endl
+                  << "\tIterator times: " << i << std::endl;
         return cx;
     }
 
+    Mvector dfp_solver(const Mvector &x, double epsilon)
+    {
+        Mvector ox = x;
+        Mvector cx;
+        // Mmatrix hessian = getHessian(cx, epsilon);
+        Mmatrix H = Mmatrix::E(fun_.getDimension());
+        Mvector ograd = getGrad(ox, epsilon);
+        Mvector grad;
+        Mvector d;
+        Mvector s;
+        Mvector y;
+        double alpha;
+        double beta;
+        double minAlpha, maxAlpha;
+        int i = 0;
+
+        while (ograd.getNorm() > epsilon) {
+            i++;
+            d = -1 * H * ograd;
+            fun_.setToOneD(ox, d);
+            MSP::advanceAndRetreat(fun_, 10, &minAlpha, &maxAlpha);
+            alpha = MSP::goldSection(fun_, minAlpha, maxAlpha, epsilon);
+            //std::cout << "alpha" << ":" << alpha << std::endl;
+            cx = ox + alpha * d;
+            grad = getGrad(cx, epsilon);
+            s = cx - ox;
+            y = grad - ograd;
+            H = H + (s * transform(s)) / (transform(s) * y) 
+                - (H * y * transform(y) * H) / (transform(y) * H * y);
+            ograd = grad;
+            ox = cx;
+        }
+
+        output("DFP Result Info:", x, cx, i);
+
+        return cx;
+    }
 private:
+    void output(std::string s,const Mvector & x, const Mvector &cx, int i) {
+        std::cout << s << std::endl
+                  << "\tThe begin point: " << transform(x) << "'" << std::endl
+                  << "\tThe result point: " << transform(cx) << "'" << std::endl
+                  << "\tIterator times: " << i << std::endl;
+
+    }
     // 数值算法计算函数在某点处的梯度
     // { 8 * [f(x+h)-f(x-h)] - f(x+2h) + f(x-2h) } / 12h
     Mvector getGrad(const Mvector &x, double epsilon)
