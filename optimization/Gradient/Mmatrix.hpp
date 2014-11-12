@@ -73,6 +73,22 @@ private:
     std::vector<double> data_;
 };
 
+class Mdouble : public Mmatrix
+{
+public:
+    Mdouble():Mmatrix(1)
+    {}
+
+    Mdouble(double a):Mmatrix(1)
+    {
+        (*this)(0,0) = a;
+    }
+    double value()
+    {
+        return (*this)(0,0);
+    }
+};
+
 Mmatrix transform(const Mmatrix & o)
 {
     Mmatrix r(o.n_, o.m_);

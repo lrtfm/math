@@ -91,6 +91,9 @@ int main()
     std::cout << "c = 2/ x" << std::endl;
     std::cout << "c = " << c << std::endl;
 
+    Mdouble a = 2;
+    std::cout << "a = " << a << std::endl;
+
     return 0;
 }
 
