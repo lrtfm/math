@@ -2,8 +2,7 @@
 #include "Mvector.hpp"
 #include <iostream>
 
-int main()
-{
+int main() {
     Mmatrix A(2, 3);
     Mmatrix B(3, 2);
     A(0, 0) = 1; A(0, 1) = 2; A(0, 2) = 3; 

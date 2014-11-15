@@ -5,21 +5,17 @@
 #include "Mfunction.hpp"
 #include "OneDimSearch.hpp"
 
-class GradientDescent 
-{
+class GradientDescent {
 public:
-    GradientDescent(FunctionObject fun) : fun_(fun)
-    {
+    GradientDescent(FunctionObject fun) : fun_(fun) {
         inner_epsilon_ = 0.000001;
     }
 
-    Mvector gd_solver(const Mvector &x, double epsilon)
-    {
+    Mvector gd_solver(const Mvector &x, double epsilon) {
         Mvector cx = x;
         Mvector grad = getGrad(cx, epsilon);
         Mvector d = -1 * grad;
         double alpha;
-        double minAlpha, maxAlpha;
         int i = 0;
 
         while (grad.getNorm() > epsilon) {
@@ -34,14 +30,11 @@ public:
     }
 
     // 共轭梯度方法
-    Mvector cg_solver(const Mvector &x, double epsilon)
-    {
+    Mvector cg_solver(const Mvector &x, double epsilon) {
         Mvector cx = x;
-        Mvector ograd = getGrad(cx, epsilon);
-        Mvector grad;
+        Mvector grad, ograd = getGrad(cx, epsilon);
         Mvector d = -1 * ograd;
-        double alpha;
-        double beta;
+        double alpha, beta;
         int i = 0;
 
         while (ograd.getNorm() > epsilon) {
@@ -49,7 +42,7 @@ public:
             alpha = oneDimSearch(cx, d, epsilon);
             cx = cx + alpha * d;
             grad = getGrad(cx, epsilon);
-            beta = ((transform(grad) * grad ) / (transform(ograd) * ograd))(0,0);
+            beta = ((transform(grad) * grad )/(transform(ograd) * ograd))(0,0);
             d = -1 * grad + beta * d;
             ograd = grad;
         }
@@ -58,16 +51,11 @@ public:
         return cx;
     }
 
-    Mvector dfp_solver(const Mvector &x, double epsilon)
-    {
-        Mvector ox = x;
-        Mvector cx;
+    Mvector dfp_solver(const Mvector &x, double epsilon) {
+        Mvector cx, ox = x;
         Mmatrix H = Mmatrix::E(fun_.getDimension());
         Mvector ograd = getGrad(ox, epsilon);
-        Mvector grad;
-        Mvector d;
-        Mvector s;
-        Mvector y;
+        Mvector grad, d, s, y;
         double alpha;
         int i = 0;
 
@@ -89,32 +77,63 @@ public:
         return cx;
     }
 
-private:
+    Mvector pattern_solver(const Mvector &x, double epsilon) {
+        int n = fun_.getDimension();
+        Mvector ox, cx = x;
+        Mvector d, y = cx;
+        Mvector e(n);
+        double delta = 2;
+        double alpha, beta = 2; //beta importan!!!
+        int k = 0;
 
-    double oneDimSearch(const Mvector & x, const Mvector & d, double epsilon)
-    {
-        double alpha;
-        double minAlpha, maxAlpha;
+        while (delta > epsilon) {
+            k++;
+            for (int i = 0; i < n; ++ i) {
+                if (fun_(y + delta*e.delta(i, 1)) < fun_(y)) {
+                    y = y + delta*e.delta(i, 1);
+                } else if (fun_(y - delta*e.delta(i, 1)) < fun_(y)) {
+                    y = y - delta*e.delta(i, 1);
+                }
+            }
+
+            // DEBUG std::cout << "k=" << k << ", delta =" << delta 
+            //                 << ", " << transform(y) << "'" << std::endl;
+            if (fun_(y) < fun_(cx)) {
+                ox = cx;
+                cx = y;
+                d = cx - ox;
+                alpha = oneDimSearch(cx, d, epsilon);
+                y = cx + alpha*d;
+            } else {
+                delta = delta / beta;
+                y = cx;
+            }
+        }
+        output("Hooke-Jeeves method result for ", x, cx, k);
+        return cx;
+    }
+
+private:
+    double oneDimSearch(const Mvector & x, const Mvector & d, double epsilon) {
+        double alpha, minAlpha, maxAlpha;
         fun_.setToOneD(x, d);
-        MSP::advanceAndRetreat(fun_, 10, &minAlpha, &maxAlpha);
+        MSP::advanceAndRetreat(fun_, 1, &minAlpha, &maxAlpha);
         alpha = MSP::goldSection(fun_, minAlpha, maxAlpha, epsilon);
         return alpha;
     }
 
-    void output(const std::string & s,const Mvector & x, const Mvector &cx, int i) {
+    void output(const std::string & s,const Mvector & x, const Mvector &cx, 
+            int i) {
         std::cout << s << " for function " << fun_.info() << ":" << std::endl
                   << "\tThe begin point: " << transform(x) << "'" << std::endl
                   << "\tThe result point: " << transform(cx) << "'" << std::endl
                   << "\tIterator times: " << i << std::endl << std::endl;
     }
 
-    // 数值算法计算函数在某点处的梯度
+    // 数值算法计算函数在某点处的梯度 
     // { 8 * [f(x+h)-f(x-h)] - f(x+2h) + f(x-2h) } / 12h
-    Mvector getGrad(const Mvector &x, double epsilon)
-    {
-        double u1;
-        double u2;
-        double l;
+    Mvector getGrad(const Mvector &x, double epsilon) {
+        double u1, u2, l;
         int d = fun_.getDimension();
         Mvector oGrad(d);
         Mvector nGrad(d);
@@ -133,7 +152,6 @@ private:
                 l = 12.0*h;
                 nGrad[i] = (u1 + u2) / l;
             }
-
             e = nGrad - oGrad;
         } while (h > inner_epsilon_ && e.getNorm() > epsilon);
         
@@ -141,8 +159,7 @@ private:
     }
 
     /*
-    Mmatrix getHessian(const Mvector &x, double epsilon)
-    {
+    Mmatrix getHessian(const Mvector &x, double epsilon) {
         // std::cout << "Begin " << std::endl;
         double n = 0.0;
         double o = 0.0;

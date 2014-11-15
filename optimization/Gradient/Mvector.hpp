@@ -4,31 +4,20 @@
 #include "Mmatrix.hpp"
 #include <string>
 
-class Mvector : public Mmatrix
-{
+class Mvector : public Mmatrix {
 public:
-    Mvector()
-    {}
+    Mvector() {}
 
-    Mvector(const Mvector &o):Mmatrix(o)
-    { 
-    }
+    Mvector(const Mvector &o):Mmatrix(o) {}
 
-    Mvector(const Mmatrix &o):Mmatrix(o)
-    { 
+    Mvector(const Mmatrix &o):Mmatrix(o) { 
         setRowCol(o.getRow() * o.getCol(), 1);
     }
 
-    Mvector(int d) : Mmatrix(d, 1) { 
-    }
-    
-    void setDim(int d) {
-        setRowCol(d, 1);
-    }
+    Mvector(int d) : Mmatrix(d, 1) {} 
 
-    int getDim() const {
-        return getRow();
-    }
+    void setDim(int d) { setRowCol(d, 1); }
+    int getDim() const { return getRow(); }
 
     Mvector delta(int i, double h) const {
         Mvector ret(*this);

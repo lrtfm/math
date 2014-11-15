@@ -4,8 +4,7 @@
 #include "Mfunction.hpp"
 
 namespace MSP {
-    void advanceAndRetreat(FunctionObject &fun, double x, double *a, double *b)
-    {
+    void advanceAndRetreat(FunctionObject &fun, double x, double *a, double *b) {
         double t = 2;
         double h = 0.1;
         if (fun(x + h) > fun(x)) {
@@ -25,8 +24,7 @@ namespace MSP {
         }
     }
 #define G 0.618
-    double goldSection(FunctionObject &fun, double a, double b, double e)
-    {
+    double goldSection(FunctionObject &fun, double a, double b, double e) {
         double lambda = a + (1 - G)*(b - a);
         double mu = a + G * (b - a);
 

@@ -2,10 +2,10 @@ all: main
 
 
 main: main.cpp GradientDescent.hpp  Mfunction.hpp  Mmatrix.hpp  Mvector.hpp  OneDimSearch.hpp
-	g++ -g main.cpp -o main
+	g++ -g -W main.cpp -o main
 
 test: test.cpp GradientDescent.hpp  Mfunction.hpp  Mmatrix.hpp  Mvector.hpp  OneDimSearch.hpp
-	g++ -g test.cpp -o test
+	g++ -g -W test.cpp -o test
 
 #g++ -g -Wl,--heap,200000000,--stack,8000000 test.cpp -o test
 

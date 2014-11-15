@@ -1,23 +1,20 @@
 #include "GradientDescent.hpp"
+#include <cmath>
 
-double function(const Mvector &x)
-{
-    return x[0] * x[0] + x[1] * x[1] + x[0];
-    // return 2*x[0] * x[0] + x[1] * x[1] + x[0];
-}
-
-double fun2(const Mvector &x)
-{
+double fun1(const Mvector &x) {
     double a = x[0];
     double b = x[1];
     return 8 *a*a + b*b + 5*b + 30;
 }
 
-int main(int argc, char **argv)
-{
-    //FunctionObject myfun(function, 2);
-    //GradientDescent gradDescent(myfun);
-    GradientDescent gradDescent(FunctionObject(fun2, 2, "f = 8x^2 + y^2 + 5y + 30"));
+double fun2(const Mvector &x) {
+    double a = x[0];
+    double b = x[1];
+    return exp(a*a + b*b + 2*b + 1);// + exp(-a*a - b*b - 2*b - 1);
+}
+
+int main(int argc, char **argv) {
+    GradientDescent gradDescent(FunctionObject(fun1, 2, "f = 8x^2 + y^2 + 5y + 30"));
 
     Mvector ret(2);
     Mvector x0(2);
@@ -27,8 +24,22 @@ int main(int argc, char **argv)
     ret = gradDescent.gd_solver(x0, 0.000001);
     ret = gradDescent.cg_solver(x0, 0.000001);
     ret = gradDescent.dfp_solver(x0, 0.000001);
+    ret = gradDescent.pattern_solver(x0, 0.000001);
 
-    //std::cout << "8x^2 + y^2 + 5y + 30" << std::endl;
+    x0[0] = 1;
+    x0[1] = 0;
+    GradientDescent gd(FunctionObject(fun2, 2, "f = exp(x^2 + y^2 + 2y + 1)"));
+    ret = gd.gd_solver(x0, 0.000001);
+    ret = gd.cg_solver(x0, 0.000001);
+    ret = gd.dfp_solver(x0, 0.000001);
+    ret = gd.pattern_solver(x0, 0.000001);
+
+    x0[0] = 10;
+    x0[1] = 5;
+    ret = gd.gd_solver(x0, 0.000001);
+    ret = gd.cg_solver(x0, 0.000001);
+    ret = gd.dfp_solver(x0, 0.000001);
+    ret = gd.pattern_solver(x0, 0.000001);
     return 0;
 }
 

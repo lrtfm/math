@@ -7,45 +7,31 @@
 class Mmatrix{
 public:
     Mmatrix():m_(0),n_(0) {}
-    Mmatrix(int n):m_(n),n_(n)
-    {
-        data_ = std::vector<double>(m_*n_, 0.0);
-    }
-    Mmatrix(int m, int n):m_(m), n_(n)
-    {
+    Mmatrix(int n):m_(n),n_(n) {
         data_ = std::vector<double>(m_*n_, 0.0);
     }
 
-    Mmatrix(const Mmatrix & o):m_(o.m_), n_(o.n_), data_(o.data_)
-    {
+    Mmatrix(int m, int n):m_(m), n_(n) {
+        data_ = std::vector<double>(m_*n_, 0.0);
     }
 
-    int getRow() const
-    {
-        return m_;
-    }
+    Mmatrix(const Mmatrix & o):m_(o.m_), n_(o.n_), data_(o.data_) {}
 
-    int getCol() const
-    {
-        return n_;
-    }
+    int getRow() const { return m_; }
+    int getCol() const { return n_; }
 
-    void setRowCol(int m, int n)
-    {
+    void setRowCol(int m, int n) {
         if (m_ * n_ != m * n)
             data_.resize(m_ * n_);
 
-        m_ = m;
-        n_ = n;
+        m_ = m; n_ = n;
     }
 
-    double & operator()(int i, int j)
-    {
+    double & operator()(int i, int j) {
         return data_[i * n_ + j];
     }
 
-    const double & operator()(int i, int j) const 
-    {
+    const double & operator()(int i, int j) const {
         return data_[i * n_ + j];
     }
 
@@ -73,24 +59,20 @@ private:
     std::vector<double> data_;
 };
 
-class Mdouble : public Mmatrix
-{
+class Mdouble : public Mmatrix {
 public:
-    Mdouble():Mmatrix(1)
-    {}
+    Mdouble():Mmatrix(1) {} 
 
-    Mdouble(double a):Mmatrix(1)
-    {
+    Mdouble(double a):Mmatrix(1) {
         (*this)(0,0) = a;
     }
-    double value()
-    {
+
+    double value() {
         return (*this)(0,0);
     }
 };
 
-Mmatrix transform(const Mmatrix & o)
-{
+Mmatrix transform(const Mmatrix & o) {
     Mmatrix r(o.n_, o.m_);
     for (int i = 0; i < o.n_; ++i) {
         for (int j = 0; j < o.m_; ++j) {
@@ -100,8 +82,7 @@ Mmatrix transform(const Mmatrix & o)
     return r;
 }
 
-std::ostream & operator<<(std::ostream &o , const Mmatrix &a)
-{
+std::ostream & operator<<(std::ostream &o , const Mmatrix &a) {
     o << "[";
     for (int i = 0; i < a.m_; ++i) {
         if (i != 0) {
@@ -115,9 +96,10 @@ std::ostream & operator<<(std::ostream &o , const Mmatrix &a)
         }
     }
     o << "]";
+    return o;
 }
-Mmatrix operator+(const Mmatrix &a, const Mmatrix &b)
-{
+
+Mmatrix operator+(const Mmatrix &a, const Mmatrix &b) {
     Mmatrix r = a;
     if (a.m_ != b.m_ || a.n_ != b.n_)
         return r; //error
@@ -130,8 +112,7 @@ Mmatrix operator+(const Mmatrix &a, const Mmatrix &b)
 
     return r;
 }
-Mmatrix operator-(const Mmatrix &a, const Mmatrix &b)
-{
+Mmatrix operator-(const Mmatrix &a, const Mmatrix &b) {
     Mmatrix r = a;
     if (a.m_ != b.m_ || a.n_ != b.n_)
         return r; //error
@@ -144,8 +125,7 @@ Mmatrix operator-(const Mmatrix &a, const Mmatrix &b)
 
     return r;
 }
-Mmatrix operator*(const Mmatrix &a, const Mmatrix &b)
-{
+Mmatrix operator*(const Mmatrix &a, const Mmatrix &b) {
     Mmatrix r(a.m_, b.n_);
 
     if (a.n_ != b.m_)
@@ -160,8 +140,7 @@ Mmatrix operator*(const Mmatrix &a, const Mmatrix &b)
     }
     return r;
 }
-Mmatrix operator*(double alpha, const Mmatrix &x)
-{
+Mmatrix operator*(double alpha, const Mmatrix &x) {
     Mmatrix r = x;
 
     for (int i = 0; i < x.m_; ++i) {
@@ -171,8 +150,7 @@ Mmatrix operator*(double alpha, const Mmatrix &x)
     }
     return r;
 }
-Mmatrix operator/(const Mmatrix &a, const Mmatrix &b)
-{
+Mmatrix operator/(const Mmatrix &a, const Mmatrix &b) {
     if (a.m_ == 1 && a.n_ == 1) {
         return a(0, 0) / b;
     }
@@ -183,9 +161,7 @@ Mmatrix operator/(const Mmatrix &a, const Mmatrix &b)
     // error TODO
     return a;
 }
-
-Mmatrix operator/(const Mmatrix &x, double alpha)
-{
+Mmatrix operator/(const Mmatrix &x, double alpha) {
     Mmatrix r = x;
     for (int i = 0; i < x.m_; ++i) {
         for (int j = 0; j < x.n_; ++j) {
@@ -194,8 +170,7 @@ Mmatrix operator/(const Mmatrix &x, double alpha)
     }
     return r;
 }
-Mmatrix operator/(double alpha, const Mmatrix &x)
-{
+Mmatrix operator/(double alpha, const Mmatrix &x) {
     Mmatrix r = x;
     for (int i = 0; i < x.m_; ++i) {
         for (int j = 0; j < x.n_; ++j) {
@@ -206,3 +181,4 @@ Mmatrix operator/(double alpha, const Mmatrix &x)
 }
 
 #endif
+
