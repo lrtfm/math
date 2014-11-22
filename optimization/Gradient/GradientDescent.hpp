@@ -15,6 +15,7 @@ public:
         Mvector cx = x;
         Mvector grad = fun_.getGrad(cx, epsilon);
         Mvector d = -1 * grad;
+        d.normalize();
         double alpha;
         int i = 0;
 
@@ -24,6 +25,9 @@ public:
             cx = cx + alpha * d;
             grad = fun_.getGrad(cx, epsilon);
             d = -1 * grad;
+//            d.normalize();
+            Debug("i=" << i << ", grad =" << grad << ", d = " << d 
+                             << ", cx =" << transform(cx) << "'" << std::endl);
         }
         output("Gradient descent method", x, cx, i); 
         return cx;
@@ -34,6 +38,7 @@ public:
         Mvector cx = x;
         Mvector grad, ograd = fun_.getGrad(cx, epsilon);
         Mvector d = -1 * ograd;
+        d.normalize();
         double alpha, beta;
         int i = 0;
 
@@ -55,6 +60,7 @@ public:
         Mvector cx, ox = x;
         Mmatrix H = Mmatrix::E(fun_.getDimension());
         Mvector ograd = fun_.getGrad(ox, epsilon);
+        ograd.normalize();
         Mvector grad, d, s, y;
         double alpha;
         int i = 0;
@@ -82,9 +88,11 @@ public:
         Mvector ox, cx = x;
         Mvector d, y = cx;
         Mvector e(n);
+        Mvector tmp;
         double delta = 2;
         double alpha, beta = 2; //beta importan!!!
         int k = 0;
+        int flag = 0;
 
         while (delta > epsilon) {
             k++;
@@ -96,15 +104,25 @@ public:
                 }
             }
 
-            Debug("k=" << k << ", delta =" << delta
-                             << ", " << transform(y) << "'" << std::endl);
+            Debug("k=" << k << ", delta =" << delta << ", alpha = " << alpha
+                             << ", " << transform(y) << "'" << ", d = " << d << std::endl);
             if (fun_(y) < fun_(cx)) {
                 ox = cx;
                 cx = y;
                 d = cx - ox;
                 alpha = oneDimSearch(cx, d, epsilon);
                 y = cx + alpha*d;
+                tmp = y - cx;
+                Debug("y = " << transform(y) << "'" << ", cx = " << cx << std::endl);
+                // 当y cx很接近时我们也认为收敛到了极小值点
+                if (tmp.getNorm() < epsilon) {
+                    flag++;
+                    if (flag > 10) {
+                        break;
+                    }
+                }
             } else {
+                flag = 0;
                 delta = delta / beta;
                 y = cx;
             }

@@ -1,11 +1,18 @@
+#ifdef ${DEBUG}
+#DFLAG=-DDEBUG
+#else
+#DFLAG=
+#endif
+
+CPPFLAG=-g -W ${DFLAG}
 all: main
 
 
 main: main.cpp GradientDescent.hpp  Mfunction.hpp  Mmatrix.hpp  Mvector.hpp  OneDimSearch.hpp Mcommon.hpp
-	g++ -g -W main.cpp -o main
+	g++ ${CPPFLAG} main.cpp -o main
 
 test: test.cpp GradientDescent.hpp  Mfunction.hpp  Mmatrix.hpp  Mvector.hpp  OneDimSearch.hpp Mcommon.hpp
-	g++ -g -W test.cpp -o test
+	g++ ${CPPFLAG} test.cpp -o test
 
 #g++ -g -Wl,--heap,200000000,--stack,8000000 test.cpp -o test
 

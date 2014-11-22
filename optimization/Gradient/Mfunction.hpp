@@ -48,6 +48,7 @@ public:
             ret = getGrad_inner(x, epsilon);
         }
 
+        // ret.normalize();
         return ret;
     }
 

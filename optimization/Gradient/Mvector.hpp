@@ -2,6 +2,8 @@
 #define __MVECTOR_HPP__
 
 #include "Mmatrix.hpp"
+#include "Mcommon.hpp"
+#include <cmath>
 #include <string>
 
 class Mvector : public Mmatrix {
@@ -34,7 +36,7 @@ public:
     double getNorm() const {
         Mmatrix r(1);
         r = transform(*this) * (*this);
-        return r(0, 0);
+        return sqrt(r(0, 0));
     }
 
     double & operator[](int i) {
@@ -43,6 +45,24 @@ public:
 
     const double & operator[](int i) const {
         return (*this)(i, 0);
+    }
+
+    void normalize() {
+        double max = 0;
+        double t = 0;
+        for (int i = 0; i < getDim(); ++i) {
+            t = fabs((*this)(i,0));
+            if (t > max) {
+                max = t;
+            }
+        }
+
+        if (t > MC::epsilon) {
+            for (int i = 0; i < getDim(); ++i) {
+                (*this)(i,0) = (*this)(i,0)/max;
+            }
+        }
+
     }
 
 };
