@@ -8,13 +8,13 @@ namespace MSP {
     void advanceAndRetreat(FunctionObject &fun, double x, double *a, double *b) {
         double t = 2;
         double h = 0.1;
-        Debug("fun(x+h) =" << fun(x+h) << std::endl);
+        // Debug("fun(x+h) =" << fun(x+h) << std::endl);
         if (fun(x + h) > fun(x)) {
             h = -h;
         }
 
         bool flag = false; // 如果第一次循环条件就不满足最后b的值需要调整
-        Debug( "fun(x+h) = " << fun(x+h) << ", fun(x) =" << fun(x) << std::endl);
+        // Debug( "fun(x+h) = " << fun(x+h) << ", fun(x) =" << fun(x) << std::endl);
         while (fun(x + h) < fun(x)) {
             x = x + h;
             h = h * t;

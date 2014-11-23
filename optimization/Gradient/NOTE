@@ -106,3 +106,9 @@ Mvector ret(2);
 Mvector x0(2);
     被析构后， 又要构造新的变量 x0 和 ret 所以导致所占内存空间重合.
 
+
+BUGCOMMIT: commit 79c20833192393d6a
+Gradient descent method 在循环中对d进行正则化
+Conjugate Gradient method 在初始时只对第一次的梯度正则化
+DFP method 同CG只正则化一次
+Hooke Jeeves method 不需要 因为不使用梯度 但要控制合适结束迭代

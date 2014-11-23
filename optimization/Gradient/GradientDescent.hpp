@@ -7,25 +7,22 @@
 
 class GradientDescent {
 public:
-    GradientDescent(FunctionObject fun) : fun_(fun) {
-        inner_epsilon_ = 0.000001;
-    }
+    GradientDescent(FunctionObject fun) : fun_(fun) { } 
 
     Mvector gd_solver(const Mvector &x, double epsilon) {
         Mvector cx = x;
         Mvector grad = fun_.getGrad(cx, epsilon);
         Mvector d = -1 * grad;
-        d.normalize();
         double alpha;
         int i = 0;
 
         while (grad.getNorm() > epsilon) {
             i++;
+            d.normalize(); // 防止d过大引起函数溢出
             alpha = oneDimSearch(cx, d, epsilon);
             cx = cx + alpha * d;
             grad = fun_.getGrad(cx, epsilon);
             d = -1 * grad;
-//            d.normalize();
             Debug("i=" << i << ", grad =" << grad << ", d = " << d 
                              << ", cx =" << transform(cx) << "'" << std::endl);
         }
@@ -38,7 +35,7 @@ public:
         Mvector cx = x;
         Mvector grad, ograd = fun_.getGrad(cx, epsilon);
         Mvector d = -1 * ograd;
-        d.normalize();
+        d.normalize(); // 防止d过大引起函数溢出
         double alpha, beta;
         int i = 0;
 
@@ -50,6 +47,8 @@ public:
             beta = ((transform(grad) * grad )/(transform(ograd) * ograd))(0,0);
             d = -1 * grad + beta * d;
             ograd = grad;
+            Debug("i=" << i << ", grad =" << grad << ", d = " << d 
+                             << ", cx =" << transform(cx) << "'" << std::endl);
         }
 
         output("Conjugate gradient method", x, cx, i);
@@ -60,7 +59,7 @@ public:
         Mvector cx, ox = x;
         Mmatrix H = Mmatrix::E(fun_.getDimension());
         Mvector ograd = fun_.getGrad(ox, epsilon);
-        ograd.normalize();
+        ograd.normalize(); // 大梯度溢出
         Mvector grad, d, s, y;
         double alpha;
         int i = 0;
@@ -149,7 +148,6 @@ private:
 
 private:
     FunctionObject fun_;
-    double inner_epsilon_;
 };
 
 #endif

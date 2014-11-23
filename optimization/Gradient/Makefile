@@ -1,8 +1,8 @@
-#ifdef ${DEBUG}
-#DFLAG=-DDEBUG
-#else
-#DFLAG=
-#endif
+ifdef DEBUG
+DFLAG=-DDEBUG
+else
+DFLAG=
+endif
 
 CPPFLAG=-g -W ${DFLAG}
 all: main

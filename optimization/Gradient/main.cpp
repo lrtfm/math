@@ -47,9 +47,9 @@ int main(int argc, char **argv) {
 
     x0[0] = 10;
     x0[1] = 5;
-    ret = gd.gd_solver(x0, 0.000001);
-    ret = gd.cg_solver(x0, 0.000001);
-    ret = gd.dfp_solver(x0, 0.000001);
+    ret = gd.gd_solver(x0, 0.00001);
+    ret = gd.cg_solver(x0, 0.00001);
+    ret = gd.dfp_solver(x0, 0.00001);
     ret = gd.pattern_solver(x0, 0.000001);
 
     FunctionObject fund(fun2, 2, "f = exp(x^2 + y^2 + 2y + 1) whit solution d");
