@@ -35,14 +35,18 @@ private:
 
 // 优先级表
 // 01234567890123456789012345678901234567890123456789012345678901234567890
-// +---------+---------+---------+---------+---------+---------+---------+
-// | con var | #       | +-      | */^     | fun     | (       | )       |
-// +---------+---------+---------+---------+---------+---------+---------+
-// | -1      | 0       | 1       | 2       | 3       | 4       | 5       |
-// +---------+---------+---------+---------+---------+---------+---------+
+// +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
+// |         | con var | #       | +-      | */      | fun     | ^       | (       | ,       | )       |
+// +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
+// | isp     | -1      | 0       | 3       | 4       | 5       | 6       | 1       |         |         |
+// +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
+// | osp     |         | 0       | 3       | 4       | 5       | 6       | 7       | 2       | 1       |
+// +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
 Element NullEle("#");
-Element Left_B("(", 4);
-Element Right_B(")", 5);
+Element Left_B("(", 7);
+Element Left_B_I("(", 1);
+Element Seprate(",", 2);
+Element Right_B(")", 1);
 
 class RPN {
 public:
@@ -72,21 +76,24 @@ bool RPN::getNextElement(Element & ele) {
             case '+':
             case '-':
                 index_++;
-                ele = Element(c, 1);
+                ele = Element(c, 3);
                 break;
             case '*':
             case '/':
+                index_++;
+                ele = Element(c, 4);
+                break;
             case '^':
                 index_++;
-                ele = Element(c, 2);
+                ele = Element(c, 6);
                 break;
             case '(':
                 index_++;
-                ele = LEFT_B;
+                ele = Left_B;
                 break;
             case ')':
                 index_++;
-                ele = RIGHT_B;
+                ele = Right_B;
                 break;
             default:
                 break;
@@ -101,25 +108,19 @@ bool RPN::getNextElement(Element & ele) {
 void RPN::change()
 {
     Element e;
-    opStack_.push(NullEle);
     while (getNextElement(ele)) {
         if (ele.isOp()) {
-            while (ele <= opStack_.top()) {
+            while ((!opStack_.empty()) && ele <= opStack_.top()) {
                 rpn_.push_back(opStack_.pop());
             }
-            if (ele == RIGHT_B)
+            if (ele == Left_B)
             {
-                // assert(opStack_.top() == LEFT_B);
-                opStack_.pop();
+                opStack_.push(Left_B_I);
+            }else if(ele == Right_B || ele == Seprate) {
+                // do nothing
             }else {
                 opStack_.push(ele);
             }
-        } else if (ele.isFun()) {
-            Element t;
-            getNextElement(t);
-            // assert(t == LEFT_B);
-            opStack_.push(t);
-            opStack_.push(ele);
         } else {
             rpn_.push_back(ele);
         }
@@ -128,7 +129,6 @@ void RPN::change()
     while (opStack_.empty()) {
         rpn_.push_back(opStack_.pop());
     }
-    rpn_.pop_back();
 }
 
 void RPN::print()
