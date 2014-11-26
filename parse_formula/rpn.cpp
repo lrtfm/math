@@ -64,8 +64,13 @@ private:
 bool RPN::getNextElement(Element & ele) {
     skipBlank();
     char c = originStr_[index_];
+    size_t i = index_;
     if (c >= '0' && c <= '9') {
-
+        while ( i <= originStr_.size() && 
+                ((originStr_[i]>= '0' && originStr_[i] <= '9') || originStr_[i] == '.')) {
+            i++;
+        }
+        ele = Element(originStr_(index_, i - index_), ET_CONSTNUM, -1);
     }
     else if (isSimpleOP(c)) {
         switch (c) {
