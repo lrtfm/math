@@ -7,18 +7,18 @@
 #include "Mrpn.hpp"
 #include "Mtoken.hpp"
 
-std::string num("0123456789");
-std::string alpha( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
-TokenRule blankRule(std::string(" \n\t"));
-TokenRule numberRule(num + ".",num);
-TokenRule keyRule(alpha + num + "_", alpha + "_");
+// std::string num("0123456789");
+// std::string alpha( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+// TokenRule blankRule(std::string(" \n\t"));
+// TokenRule numberRule(num + ".",num);
+// TokenRule keyRule(alpha + num + "_", alpha + "_");
 
 int main()
 {
-    TokenProcess process;
-    process.setBlankRule(blankRule);
-    process.addTokenRule(numberRule);
-    process.addTokenRule(keyRule);
+//     TokenProcess process;
+//     process.setBlankRule(blankRule);
+//     process.addTokenRule(numberRule);
+//     process.addTokenRule(keyRule);
     char name[256];
     std::string token;
     while (1) {
@@ -28,14 +28,20 @@ int main()
         if (std::cin.eof()) {
             break;
         }
-        size_t i = 0;
-        while (process.getToken(name, i, token)) {
-            std::cout << "\t" << token;
-        }
+//         size_t i = 0;
+//         try {
+//             while (process.getToken(name, i, token)) {
+//                 std::cout << "\t" << token;
+//             }
+//             std::cout << std::endl;
+//         }
+//         catch (UnknowToken & e) {
+//             std::cout << std::endl << e.info() << std::endl;
+//         }
 
-        // RPN test(name);
-        // test.change();
-
+        RPN test(name);
+        test.change();
+        test.print();
     }
     return 0;
 }

@@ -6,6 +6,7 @@
 
 #ifndef MRPN_HPP__
 #define MRPN_HPP__
+#include "Mtoken.hpp"
 #include "Melement.hpp"
 
 class RPN {
@@ -18,10 +19,8 @@ public:
     void change();
     void print();
 private:
-    void skipBlank();
-    void getName(std::string & name);
     bool isSysKey(std::string & name) {
-        return systemKeyEleMap.find(name) != systemKeyEleMap.end();
+        return systemKeyEleMap_.find(name) != systemKeyEleMap_.end();
     }
     bool isUserVar(std::string &name) {
         return userKeyEleMap_.find(name) != userKeyEleMap_.end();
@@ -30,18 +29,14 @@ private:
         return (name[0] >= '0' && name [0] <= '9');
     }
 
-    bool isSimpleOP(char c) {
-        return (c == '+' || c == '-' || c == '*' || 
-                c == '/' || c == '^' || c == '(' || 
-                c == ',' || c == ')');
-    }
-
 private:
     size_t index_;
     std::string originStr_;
     std::vector<Element> opStack_;
     std::vector<Element> rpn_;
     KeyElementMap userKeyEleMap_;
+    static KeyElementMap systemKeyEleMap_;
+    static TokenProcess tokenProcess_;
 };
 
 #endif 

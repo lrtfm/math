@@ -7,10 +7,21 @@
 #ifndef MTOKEN_HPP__
 #define MTOKEN_HPP__
 
+#include "Mexception.hpp"
+
 #include <vector>
 #include <string>
 #include <set>
 #include <iostream>
+
+
+class UnknowToken : public ExceptionBase {
+public:
+    UnknowToken() : ExceptionBase("UnknowToken")
+    {}
+    UnknowToken(const std::string & info) : ExceptionBase("UnknowToken:" + info)
+    {}
+};
 
 class TokenRule {
 public:
@@ -82,6 +93,9 @@ private:
 class TokenProcess {
 public:
     TokenProcess() {}
+    TokenProcess(TokenRule & blank, std::vector<TokenRule> & rules) 
+        : blankRule_(blank), tokenRules_(rules)
+    {}
     ~TokenProcess() {}
 
     void setBlankRule(TokenRule & rule) {
@@ -140,8 +154,7 @@ public:
                 }
             }
         }
-        // 抛出异常
-        std::cout << "UnKnow token" << name.substr(index) << std::endl;
+        throw UnknowToken(name.substr(index));
         return false;
     }
 

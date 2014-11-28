@@ -53,7 +53,6 @@ private:
 
 typedef std::map<std::string, Element> KeyElementMap;
 
-extern std::string END_NAME;
 extern Element Left_B;
 extern Element Seprate;
 extern Element Right_B;
