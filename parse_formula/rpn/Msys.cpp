@@ -10,17 +10,23 @@ namespace MC {
 
 char dot = '.';
 char underLine = '_';
+std::string blank(" \n\t");
 std::string num("0123456789");
 std::string simpOp("+-*/^(,)");
 std::string alphabet("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
-TokenRule blankRule(std::string(" \n\t"));
+TokenRule blankRule(blank);
 TokenRule numRule(num + dot, num, num);
 TokenRule keyRule(alphabet + num + underLine, alphabet + underLine);
 TokenRule sopRule(simpOp);
+TokenRule sepVarRule(blank + simpOp);
 
 TokenRule rules[] = { numRule, keyRule, sopRule};
 std::vector<TokenRule> ruleVect(rules, rules + 3);
+std::vector<TokenRule> varRuleVect(rules + 1, rules + 2);
+
+TokenProcess tokenProcess(blankRule, ruleVect);
+TokenProcess varProcess(sepVarRule, varRuleVect);
 
 const char *ADD = "+";
 const char *SUB = "-";
@@ -62,6 +68,8 @@ const KeyElementMap::value_type  systemKeyPair[] =
     KeyElementMap::value_type(SIN, Sin),
     KeyElementMap::value_type(COS, Cos),
 };
-const KeyElementMap systemKeyMap(systemKeyPair, systemKeyPair + 11); 
+KeyElementMap systemKeyMap(systemKeyPair, systemKeyPair + 11); 
+ElementClass systemElementClass(&systemKeyMap);
+NumberElementClass numberElementClass;
 
 }

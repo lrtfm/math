@@ -154,7 +154,7 @@ public:
                 }
             }
         }
-        throw UnknowToken(name.substr(index));
+        throw UnknowToken("\"" + name.substr(index) + "\"");
         return false;
     }
 

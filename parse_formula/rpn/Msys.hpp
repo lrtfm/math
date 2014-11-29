@@ -16,10 +16,13 @@ namespace MC {
     extern Element Lba_i;
     extern Element Rba;
     extern Element Com;
+
     extern TokenRule numRule;
-    extern TokenRule blankRule;
-    extern std::vector<TokenRule> ruleVect;
-    extern const KeyElementMap systemKeyMap;
+    extern TokenProcess tokenProcess;
+    extern TokenProcess varProcess;
+
+    extern ElementClass systemElementClass;
+    extern NumberElementClass numberElementClass;
 }
 
 #endif

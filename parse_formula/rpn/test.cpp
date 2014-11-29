@@ -20,9 +20,12 @@ int main()
 //     process.addTokenRule(numberRule);
 //     process.addTokenRule(keyRule);
     char name[256];
+    char var[256];
     std::string token;
     while (1) {
         std::cout << std::endl;
+        std::cout << "Please input var:" << std::endl;
+        std::cin.getline(var, 256);
         std::cout << "Please input formual:" << std::endl;
         std::cin.getline(name, 256);
         if (std::cin.eof()) {
@@ -39,8 +42,7 @@ int main()
 //             std::cout << std::endl << e.info() << std::endl;
 //         }
 
-        RPN test(name);
-        test.change();
+        FunctionBase test(var, name);
         test.print();
     }
     return 0;

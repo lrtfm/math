@@ -20,29 +20,17 @@ enum ElementType {
 
 class Element {
 public:
-    Element(){}
-    Element(const char *str)
-        :str_(str), type_(ET_OPERATOR), priority_(0) {}
-    Element(const char *str, int priority)
-        :str_(str), type_(ET_OPERATOR), priority_(priority) {}
-    Element(const char *str, ElementType type, int priority)
-        :str_(str), type_(type), priority_(priority) {}
-    Element(const std::string &str, ElementType type, int priority)
-        :str_(str), type_(type), priority_(priority) {}
+    Element();
+    Element(const char *str);
+    Element(const char *str, int priority);
+    Element(const char *str, ElementType type, int priority);
+    Element(const std::string &str, ElementType type, int priority);
 
-    bool isOp() { 
-        return type_ == ET_OPERATOR;
-    }
-    ElementType getType() {
-        return type_;
-    }
-    bool operator==(const Element o) {
-        return (type_ == o.type_ 
-                && priority_ == o.priority_ && str_ == o.str_);
-    }
-    bool operator<=(const Element o) {
-        return (priority_ <= o.priority_);
-    }
+    bool isOp(); 
+    void setName(std::string & name);     
+    ElementType getType(); 
+    bool operator==(const Element o);
+    bool operator<=(const Element o);
 
 public:
     std::string str_;
@@ -53,10 +41,56 @@ private:
 
 typedef std::map<std::string, Element> KeyElementMap;
 
-extern Element Left_B;
-extern Element Seprate;
-extern Element Right_B;
-extern Element Left_B_I;
-extern const KeyElementMap systemKeyEleMap;
+class ElementClassBase {
+public:
+    ElementClassBase() {}
+    virtual bool isExist(std::string & name) = 0;
+    virtual Element & getElementByName(std::string &name) = 0;
+
+    virtual ~ElementClassBase() {}
+};
+
+class NumberElementClass : public ElementClassBase {
+public:
+    virtual bool isExist(std::string & name);
+    virtual Element & getElementByName(std::string & name);
+
+private:
+    Element element_;
+};
+
+class ElementClass : public ElementClassBase{
+public:
+    ElementClass();
+    ElementClass(KeyElementMap * elementMap);
+    void setElementMap(KeyElementMap * elementMap);
+    KeyElementMap* getElementMap();
+
+    virtual bool isExist(std::string & name);
+    virtual Element & getElementByName(std::string & name);
+
+private:
+    KeyElementMap * elementMap_;
+};
+
+class ElementManager {
+public:
+    ElementManager();
+    void init(std::string & var);
+    Element & getElementByName(std::string & name); 
+
+    ~ElementManager();
+private:
+
+    void initUserDefineElement(std::string & var);
+
+    void addElementClass(ElementClassBase * eleClass);
+    void delAllElementClass();
+
+
+private:
+    ElementClass userDefElementS_;
+    std::vector<ElementClassBase *> elementClassVect_;
+};
 
 #endif
