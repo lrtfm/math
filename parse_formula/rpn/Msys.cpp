@@ -5,6 +5,8 @@
  */
 
 #include "Msys.hpp"
+#include <cmath>
+#include <stack>
 
 namespace MC {
 
@@ -24,9 +26,11 @@ TokenRule sepVarRule(blank + simpOp);
 TokenRule rules[] = { numRule, keyRule, sopRule};
 std::vector<TokenRule> ruleVect(rules, rules + 3);
 std::vector<TokenRule> varRuleVect(rules + 1, rules + 2);
+std::vector<TokenRule> numRuleVect(rules, rules + 1);
 
 TokenProcess tokenProcess(blankRule, ruleVect);
 TokenProcess varProcess(sepVarRule, varRuleVect);
+TokenProcess numProcess(sepVarRule, numRuleVect);
 
 const char *ADD = "+";
 const char *SUB = "-";
@@ -71,5 +75,50 @@ const KeyElementMap::value_type  systemKeyPair[] =
 KeyElementMap systemKeyMap(systemKeyPair, systemKeyPair + 11); 
 ElementClass systemElementClass(&systemKeyMap);
 NumberElementClass numberElementClass;
+
+void compute(Element & ele, std::stack<double> & mem)
+{
+    double x, y, z, ret;
+    if (ele == Add) {
+            y = mem.top(); mem.pop();
+            x = mem.top(); mem.pop();
+            ret = x + y;
+            mem.push(ret);
+    } else if (ele == Sub) {
+            y = mem.top(); mem.pop();
+            x = mem.top(); mem.pop();
+            ret = x - y;
+            mem.push(ret);
+    } else if (ele == Mul) {
+            y = mem.top(); mem.pop();
+            x = mem.top(); mem.pop();
+            ret = x * y;
+            mem.push(ret);
+    } else if (ele == Div) {
+            y = mem.top(); mem.pop();
+            x = mem.top(); mem.pop();
+            ret = x / y;
+            mem.push(ret);
+    } else if (ele == Pow) {
+            y = mem.top(); mem.pop();
+            x = mem.top(); mem.pop();
+            ret = pow(x,y);
+            mem.push(ret);
+    } else if (ele == Exp) {
+            x = mem.top(); mem.pop();
+            ret = exp(x);
+            mem.push(ret);
+    } else if (ele == Sin) {
+            x = mem.top(); mem.pop();
+            ret = sin(x);
+            mem.push(ret);
+    } else if (ele == Cos) {
+            x = mem.top(); mem.pop();
+            ret = cos(x);
+            mem.push(ret);
+    } else {
+            //error
+    }
+}
 
 }

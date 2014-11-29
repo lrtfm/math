@@ -10,6 +10,8 @@
 
 #include "Mtoken.hpp"
 #include "Melement.hpp"
+#include <stack>
+
 
 namespace MC {
     extern Element Lba;
@@ -20,9 +22,11 @@ namespace MC {
     extern TokenRule numRule;
     extern TokenProcess tokenProcess;
     extern TokenProcess varProcess;
+    extern TokenProcess numProcess;
 
     extern ElementClass systemElementClass;
     extern NumberElementClass numberElementClass;
+    void compute(Element & ele, std::stack<double> & mem);
 }
 
 #endif

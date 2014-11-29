@@ -28,6 +28,7 @@ public:
 
     bool isOp(); 
     void setName(std::string & name);     
+    std::string getName();
     ElementType getType(); 
     bool operator==(const Element o);
     bool operator<=(const Element o);
@@ -79,6 +80,25 @@ public:
     void init(std::string & var);
     Element & getElementByName(std::string & name); 
 
+    void setValue(size_t i, double v) {
+        userDefValue_[i].value = v;
+    }
+
+    double getValue(const std::string & name) {
+        for (size_t i = 0; i < userDefValue_.size(); ++i)
+        {
+            if (userDefValue_[i].name == name) {
+                return userDefValue_[i].value;
+            }
+        }
+        // error
+        return 0;
+    }
+
+    size_t getNumber() {
+        return userDefValue_.size();
+    }
+
     ~ElementManager();
 private:
 
@@ -87,8 +107,16 @@ private:
     void addElementClass(ElementClassBase * eleClass);
     void delAllElementClass();
 
+    struct NameValue {
+        NameValue(std::string & n, double v)
+            : name(n), value(v)
+        {}
+        std::string name;
+        double value;
+    };
 
 private:
+    std::vector<NameValue> userDefValue_;
     ElementClass userDefElementS_;
     std::vector<ElementClassBase *> elementClassVect_;
 };

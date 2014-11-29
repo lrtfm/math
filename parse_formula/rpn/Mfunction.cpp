@@ -6,7 +6,8 @@
 
 #include "Mtoken.hpp"
 #include "Msys.hpp"
-#include "Mrpn.hpp"
+#include "Mfunction.hpp"
+#include <cstdlib>
 
 FunctionBase::FunctionBase() : needInit_(true)
 {}
@@ -94,6 +95,46 @@ void FunctionBase::rpnTranform()
     }
     catch (UnknowToken & e) {
         std::cout << std::endl << e.info() << std::endl;
+    }
+}
+
+double FunctionBase::compute(std::vector<double> v)
+{
+    size_t num = eleManager_.getNumber();
+    size_t n = v.size();
+    if (num > n) {
+        num = n;
+    }
+    for (int i = 0; i < num; ++i) {
+        std::cout << " i:" <<v[i] ;
+        eleManager_.setValue(i, v[i]);
+    }
+    std::cout <<std::endl;
+
+    std::stack<double> memory;
+
+    for (int i = 0; i < rpn_.size(); ++i) {
+        switch (rpn_[i].getType()) {
+            case ET_CONSTNUM: 
+                memory.push(atof(rpn_[i].getName().c_str()));
+                break;
+            case ET_VARIATION:
+                memory.push(eleManager_.getValue(rpn_[i].getName()));
+                break;
+            case ET_OPERATOR:
+                MC::compute(rpn_[i], memory);
+                break;
+            default:
+                // error
+                break;
+        }
+    }
+
+    if (memory.size() == 1) {
+        return memory.top();
+    } else {
+        // error
+        return 0;
     }
 }
 

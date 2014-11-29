@@ -31,6 +31,10 @@ void Element::setName(std::string & name)
 {
     str_ = name;
 }
+std::string Element::getName()
+{
+    return str_;
+}
 ElementType Element::getType() 
 {
     return type_;
@@ -105,6 +109,7 @@ void ElementManager::initUserDefineElement(std::string & var)
         eleMap->insert(
                 KeyElementMap::value_type(
                     token, Element(token, ET_VARIATION, -1)));
+        userDefValue_.push_back(NameValue(token, 0.0));
     }
 }
 

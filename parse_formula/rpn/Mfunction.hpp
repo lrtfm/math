@@ -23,6 +23,8 @@ public:
 
     void print();
 
+    double compute(std::vector<double> v);
+
 private:
 
     void init(); 

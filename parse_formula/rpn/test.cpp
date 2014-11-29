@@ -4,23 +4,17 @@
  * YangZongze yangzongze@gmail.com
  */
 
-#include "Mrpn.hpp"
+#include "Mfunction.hpp"
 #include "Mtoken.hpp"
-
-// std::string num("0123456789");
-// std::string alpha( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
-// TokenRule blankRule(std::string(" \n\t"));
-// TokenRule numberRule(num + ".",num);
-// TokenRule keyRule(alpha + num + "_", alpha + "_");
+#include "Msys.hpp"
+#include <cstdlib>
 
 int main()
 {
-//     TokenProcess process;
-//     process.setBlankRule(blankRule);
-//     process.addTokenRule(numberRule);
-//     process.addTokenRule(keyRule);
     char name[256];
     char var[256];
+    char p[256];
+    std::vector<double> v;
     std::string token;
     while (1) {
         std::cout << std::endl;
@@ -31,19 +25,26 @@ int main()
         if (std::cin.eof()) {
             break;
         }
-//         size_t i = 0;
-//         try {
-//             while (process.getToken(name, i, token)) {
-//                 std::cout << "\t" << token;
-//             }
-//             std::cout << std::endl;
-//         }
-//         catch (UnknowToken & e) {
-//             std::cout << std::endl << e.info() << std::endl;
-//         }
 
         FunctionBase test(var, name);
         test.print();
+        while(1) {
+            v.resize(0);
+            std::cout << "Please input p value:" << std::endl;
+            std::cin.getline(var, 256);
+            if (var[0] == '#') {
+                break;
+            }
+            size_t index = 0;
+            while(MC::numProcess.getToken(var, index, token)) {
+                std::cout << "Token:" <<token;
+                v.push_back(atof(token.c_str()));
+            }
+            std::cout <<std::endl;
+            std::cout <<"result: " << test.compute(v) <<std::endl;
+            if (std::cin.eof()) { break; }
+        }
+
     }
     return 0;
 }
