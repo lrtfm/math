@@ -1,17 +1,19 @@
 CC=g++
 CPPFLAGS=-g
 
-SOURCE := $(shell ls *.cpp)
-DEPS := $(shell ls *.hpp)
+TARGET := test
+SOURCE := $(wildcard *.cpp)
+DEPS := $(wildcard *.hpp)
 OBJ := $(SOURCE:.cpp=.o)
+#OBJ := $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 
-all:rpn
+all:$(TARGET)
 
 %.o: %.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(CPPFLAGS)
 
-rpn: $(OBJ)
+$(TARGET): $(OBJ)
 	$(CC) -o $@ $^ $(CPPFLAGS)
 
 clean:
-	rm -rf $(OBJ) rpn
+	rm -rf $(OBJ) $(TARGET)
