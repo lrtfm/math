@@ -1,5 +1,13 @@
-#ifndef __MFUNCTION_HPP__
-#define __MFUNCTION_HPP__
+/*
+ * Mfunction.hpp
+ *
+ * 2014-12-23  1:02:10
+ *
+ * YangZongze yangzongze@gmail.com
+ */
+
+#ifndef MFUNCTION_HPP__
+#define MFUNCTION_HPP__
 #include "Mcommon.hpp"
 #include "Mvector.hpp"
 

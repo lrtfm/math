@@ -8,7 +8,6 @@
 #ifndef MCOMMON_HPP_
 #define MCOMMON_HPP_
 
-
 namespace MC {
 
 const double epsilon = 0.00001;
@@ -19,7 +18,6 @@ const double epsilon = 0.00001;
 #else
 #define Debug(x)
 #endif
-
 }
 
 #endif /* MCOMMON_HPP_ */

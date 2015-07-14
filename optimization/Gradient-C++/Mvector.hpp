@@ -1,5 +1,13 @@
-#ifndef __MVECTOR_HPP__
-#define __MVECTOR_HPP__
+/*
+ * Mvector.hpp
+ *
+ * 2014-12-23  1:02:47
+ *
+ * YangZongze yangzongze@gmail.com
+ */
+
+#ifndef MVECTOR_HPP__
+#define MVECTOR_HPP__
 
 #include "Mmatrix.hpp"
 #include "Mcommon.hpp"

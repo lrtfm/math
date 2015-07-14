@@ -1,5 +1,13 @@
-#ifndef __OneDimSearch_hpp__
-#define __OneDimSearch_hpp__
+/*
+ * OneDimSearch.hpp
+ *
+ * 2014-12-23  1:03:15
+ *
+ * YangZongze yangzongze@gmail.com
+ */
+
+#ifndef OneDimSearch_hpp__
+#define OneDimSearch_hpp__
 
 #include "Mcommon.hpp"
 #include "Mfunction.hpp"

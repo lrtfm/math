@@ -1,4 +1,7 @@
 tags
+GTAGS
+GPATH
+GRTAGS
 *~
 *.o
 *.i

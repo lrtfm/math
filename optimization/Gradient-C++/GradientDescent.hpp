@@ -1,5 +1,13 @@
-#ifndef __GRADIENTDESCENT_HPP__
-#define __GRADIENTDESCENT_HPP__
+/*
+ * GradientDescent.hpp
+ *
+ * 2014-12-23  1:01:20
+ *
+ * YangZongze yangzongze@gmail.com
+ */
+
+#ifndef GRADIENTDESCENT_HPP__
+#define GRADIENTDESCENT_HPP__
 #include "Mvector.hpp"
 #include "Mmatrix.hpp"
 #include "Mfunction.hpp"
@@ -78,7 +86,7 @@ public:
             ox = cx;
         }
 
-        output("DFP method result for ", x, cx, i);
+        output("DFP method result", x, cx, i);
         return cx;
     }
 
@@ -126,7 +134,7 @@ public:
                 y = cx;
             }
         }
-        output("Hooke-Jeeves method result for ", x, cx, k);
+        output("Hooke-Jeeves method result", x, cx, k);
         return cx;
     }
 

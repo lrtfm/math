@@ -1,5 +1,13 @@
-#ifndef __MMATRIX_HPP__
-#define __MMATRIX_HPP__
+/*
+ * Mmatrix.hpp
+ *
+ * 2014-12-23  1:02:30
+ *
+ * YangZongze yangzongze@gmail.com
+ */
+
+#ifndef MMATRIX_HPP__
+#define MMATRIX_HPP__
 
 #include <iostream>
 #include <vector>

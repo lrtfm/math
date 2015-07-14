@@ -1,3 +1,11 @@
+/*
+ * main.cpp
+ *
+ * 2014-12-23  1:01:45
+ *
+ * YangZongze yangzongze@gmail.com
+ */
+
 #include "GradientDescent.hpp"
 #include <cmath>
 
@@ -52,7 +60,7 @@ int main(int argc, char **argv) {
     ret = gd.dfp_solver(x0, 0.00001);
     ret = gd.pattern_solver(x0, 0.000001);
 
-    FunctionObject fund(fun2, 2, "f = exp(x^2 + y^2 + 2y + 1) whit solution d");
+    FunctionObject fund(fun2, 2, "f = exp(x^2 + y^2 + 2y + 1) whit exact d");
     std::vector<MutilFun> df;
     df.push_back(d1fun2);
     df.push_back(d2fun2);
