@@ -110,7 +110,7 @@ void RPNexpression::transform(std::string & expression)
             ele = getElementByName(name);
             if (!ele.isValid()) {
                 // error todo
-                throw UnknowToken();
+                throw UnknowToken(name);
              }
             if (ele.isOp()) {
                 while ((!opStack_.empty()) && ele <= opStack_.back()) {
@@ -239,10 +239,10 @@ void RPNexpression::elementCompute(Element & ele, std::stack<double> & mem)
 }
 void RPNexpression::print()
 {
-    std::cout << std::endl;
-    std::cout << "---RPN:    ";
-    for (int i = 0; i < rpn_.size(); ++i) {
-        std::cout << rpn_[i].str_ << " ";
-    }
-    std::cout << std::endl;
+//    std::cout << std::endl;
+//    std::cout << "---RPN:    ";
+//    for (int i = 0; i < rpn_.size(); ++i) {
+//        std::cout << rpn_[i].str_ << " ";
+//    }
+//    std::cout << std::endl;
 }

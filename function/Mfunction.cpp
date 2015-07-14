@@ -31,4 +31,3 @@ double FunctionBase::compute(std::vector<double> v)
     return rpnE_.compute(v);
 }
 
-

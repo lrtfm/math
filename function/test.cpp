@@ -8,52 +8,95 @@
 #include "Mtoken.hpp"
 #include <cstdlib>
 
+#include <map>
+
+
+typedef std::map<std::string, double> Workspace;
+
+
 int main()
 {
     char dot = '.';
+    char underLine = '_';
     std::string blank(" \n\t");
     std::string num("0123456789");
+    std::string alphabet("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
     TokenRule blankRule(blank);
+    TokenRule keyRule(alphabet + num + underLine, alphabet + underLine);
     TokenRule numRule(num + dot, num, num);
     TokenRule sepRule(blank + ",");
 
     std::vector<TokenRule> numRuleVect(1, numRule);
+    std::vector<TokenRule> keyRuleVect(1, keyRule);
     TokenProcess numProcess(sepRule, numRuleVect);
+    TokenProcess keyProcess(sepRule, keyRuleVect);
 
-    char name[256];
-    char var[256];
-    char p[256];
+    Workspace workspace;
+
+    // char name[256];
+    std::string name;
+    std::string var;
     std::vector<double> v;
     std::string token;
+    std::string valueStr;
     while (1) {
-        std::cout << std::endl;
-        std::cout << "Please input var:" << std::endl;
-        std::cin.getline(var, 256);
-        std::cout << "Please input formual:" << std::endl;
-        std::cin.getline(name, 256);
-        if (std::cin.eof()) {
+        name.clear();
+        std::cout << ">> " ;
+        std::getline(std::cin, name);
+        if (name == "exit" || name == "#") {
             break;
+        } 
+        if (name.size() == 0 || blankRule.isMatchRule(name)) {
+            continue;
         }
+        std::size_t found = name.find('=');
+        size_t index = 0;
+        if (std::string::npos != found) {
 
-        FunctionBase test(var, name);
-        test.init();
-        while(1) {
-            v.resize(0);
-            std::cout << "Please input parameter value:" << std::endl;
-            std::cin.getline(var, 256);
-            if (var[0] == '#') {
-                break;
+            // before =
+            try {
+                keyProcess.getToken(name, index, token);
+            } catch (UnknowToken &t) {
+                std::cout << t.info() << std::endl;
+                continue;
             }
-            size_t index = 0;
-            while(numProcess.getToken(var, index, token)) {
-                std::cout << "Token:" <<token;
-                v.push_back(atof(token.c_str()));
+
+            // after =
+            try {
+                index = 0;
+                numProcess.getToken(name.substr(found + 1), index, valueStr);
+                workspace.insert(std::make_pair(token, atof(valueStr.c_str())));
+            } catch (UnknowToken &t) {
+                try {
+                    index = 0;
+                    keyProcess.getToken(name.substr(found + 1), index, valueStr);
+                    if (workspace.end() != workspace.find(valueStr)) {
+                        workspace.insert(std::make_pair(token, workspace[valueStr]));
+                    }
+                    else {
+                        std::cout << "Unknow Token: " << valueStr << std::endl;
+                        continue;
+                    }
+                } catch (UnknowToken &t) {
+                    std::cout << t.info() << std::endl;
+                    continue;
+                }
             }
-            std::cout <<std::endl;
-            std::cout <<"result: " << test.compute(v) <<std::endl;
-            if (std::cin.eof()) { break; }
+        } else {
+            var.clear();
+            v.clear();
+            for (Workspace::iterator it = workspace.begin(); it != workspace.end(); ++it) {
+                var = var + " " + it->first;
+                v.push_back(it->second);
+            }
+            // std::cout << "var :" << var << std::endl;
+            FunctionBase test(var, name);
+            test.init();
+            // std::cout <<"result: " << test.compute(v) <<std::endl;
+            std::cout << test.compute(v) << std::endl;
         }
-
     }
+
+
     return 0;
 }
