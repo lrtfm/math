@@ -3,13 +3,9 @@ SOURCE_DIR=src
 OBJECT_DIR=obj
 BIN_DIR=bin
 LIB_DIR=lib
-RPN_DIR=rpn
 CFLAGS=-g -c
 
 all:parse_formula test_trim static_lib share_lib
-
-rpn:${RPN_DIR}/rpn.cpp
-	g++ -g ${RPN_DIR}/rpn.cpp -o ${RPN_DIR}/rpn
 
 objects=${OBJECT_DIR}/parse.o ${OBJECT_DIR}/collect.o ${OBJECT_DIR}/math_wapper.o
 test_objects=${OBJECT_DIR}/collect.o ${OBJECT_DIR}/test_trim.o
@@ -50,4 +46,5 @@ create_dir:
 	mkdir -p ${LIB_DIR}
 
 clean:
-	rm -rf ${BIN_DIR} ${OBJECT_DIR} ${LIB_DIR} ${RPN_DIR}/rpn
+	rm -rf ${BIN_DIR} ${OBJECT_DIR} ${LIB_DIR} 
+
