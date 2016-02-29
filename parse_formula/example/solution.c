@@ -1,8 +1,7 @@
 /*
- *
  * solution.c 
  * for hw 1.2.1
- *
+ * Numerical Partial Differential Equations --- Finite Difference Methods (1995)(J.W. Thomas)
  */
 
 #include "parse_formula.h"

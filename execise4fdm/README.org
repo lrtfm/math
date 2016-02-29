@@ -1,0 +1,2 @@
+差分法课后练习实现
+教材: Numerical Partial Differential Equations_ Finite Difference Methods (1995)(J.W. Thomas)

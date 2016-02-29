@@ -1,3 +1,15 @@
+/* fade.c
+ *
+ * for paper
+ *      Title   = {Finite difference approximations for fractional advection-dispersion flow equations},
+ *      Author  = {Mark M. Meerschaert and Charles Tadjeran},
+ *      Journal = {Journal of Computational and Applied Mathematics},
+ *      Year    = {2004},
+ *
+ * Compile
+ * cygwin: gcc -g -Wl,--stack,16000000 fade.c -llapack -lgfortran -o fade
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
